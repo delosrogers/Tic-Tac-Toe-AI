@@ -4656,7 +4656,7 @@ var $elm$core$Array$repeat = F2(
 			});
 	});
 var $author$project$Main$init = {
-	board: A2($elm$core$Array$repeat, 9, $author$project$Main$NoOne),
+	board: A2($elm$core$Array$repeat, 16, $author$project$Main$NoOne),
 	currentPlayer: $author$project$Main$PlayerX,
 	message: ''
 };
@@ -5344,40 +5344,9 @@ var $elm$core$List$any = F2(
 		}
 	});
 var $Chadtech$elm_bool_extra$Bool$Extra$any = $elm$core$List$any($elm$core$Basics$identity);
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
 };
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
@@ -5404,6 +5373,59 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
+var $elm$core$Basics$pow = _Basics_pow;
+var $author$project$Main$generateChildIdxArray = F3(
+	function (baseArr, numberofRows, idx) {
+		return (_Utils_cmp(idx, numberofRows) < 0) ? A2(
+			$elm$core$Array$map,
+			function (i) {
+				return (i * numberofRows) + idx;
+			},
+			baseArr) : ((_Utils_cmp(idx, numberofRows * 2) < 0) ? A2(
+			$elm$core$Array$map,
+			function (i) {
+				return i + idx;
+			},
+			baseArr) : (_Utils_eq(
+			idx,
+			A2(
+				$elm$core$Basics$pow,
+				$elm$core$Array$length(baseArr),
+				2)) ? A2(
+			$elm$core$Array$map,
+			function (i) {
+				return ((i * ($elm$core$Array$length(baseArr) + 1)) + $elm$core$Array$length(baseArr)) + 1;
+			},
+			baseArr) : A2(
+			$elm$core$Array$map,
+			function (i) {
+				return ((i * ($elm$core$Array$length(baseArr) - 1)) + $elm$core$Array$length(baseArr)) - 1;
+			},
+			baseArr)));
+	});
+var $elm$core$Basics$round = _Basics_round;
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$Main$generateIdxArray = function (model) {
+	var numberofRows = $elm$core$Basics$round(
+		$elm$core$Basics$sqrt(
+			$elm$core$Array$length(model.board)));
+	var numberofArraysArray = A2(
+		$elm$core$Array$initialize,
+		$elm$core$Basics$round(
+			2 + (2 * $elm$core$Basics$sqrt(
+				$elm$core$Array$length(model.board)))),
+		$elm$core$Basics$identity);
+	var baseArray = A2(
+		$elm$core$Array$initialize,
+		$elm$core$Basics$round(
+			$elm$core$Basics$sqrt(
+				$elm$core$Array$length(model.board))),
+		$elm$core$Basics$identity);
+	return A2(
+		$elm$core$Array$map,
+		A2($author$project$Main$generateChildIdxArray, baseArray, numberofRows),
+		numberofArraysArray);
+};
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$equal3 = function (arr) {
 	var get = $elm$core$Array$get;
@@ -5437,34 +5459,7 @@ var $author$project$Main$outerWinMap = F2(
 	});
 var $author$project$Main$checkPlayerWin = F2(
 	function (player, model) {
-		var idx_array = $elm$core$Array$fromList(
-			_List_fromArray(
-				[
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[0, 3, 6])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[1, 4, 7])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[2, 5, 8])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[0, 1, 2])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[3, 4, 5])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[6, 7, 8])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[0, 4, 8])),
-					$elm$core$Array$fromList(
-					_List_fromArray(
-						[2, 4, 6]))
-				]));
+		var idx_array = $author$project$Main$generateIdxArray(model);
 		return $Chadtech$elm_bool_extra$Bool$Extra$any(
 			$elm$core$Array$toList(
 				A2(
@@ -5571,29 +5566,35 @@ var $joakin$elm_canvas$Canvas$rect = F3(
 	function (pos, width, height) {
 		return A3($joakin$elm_canvas$Canvas$Internal$Canvas$Rect, pos, width, height);
 	});
-var $author$project$Main$drawGrid = _List_fromArray(
-	[
-		A3(
-		$joakin$elm_canvas$Canvas$rect,
-		_Utils_Tuple2(167, 0),
-		5,
-		500),
-		A3(
-		$joakin$elm_canvas$Canvas$rect,
-		_Utils_Tuple2(333, 0),
-		5,
-		500),
-		A3(
-		$joakin$elm_canvas$Canvas$rect,
-		_Utils_Tuple2(0, 167),
-		500,
-		5),
-		A3(
-		$joakin$elm_canvas$Canvas$rect,
-		_Utils_Tuple2(0, 333),
-		500,
-		5)
-	]);
+var $author$project$Main$drawGrid = F3(
+	function (width, height, model) {
+		var numRows = $elm$core$Basics$round(
+			$elm$core$Basics$sqrt(
+				$elm$core$Array$length(model.board)));
+		return _List_fromArray(
+			[
+				A3(
+				$joakin$elm_canvas$Canvas$rect,
+				_Utils_Tuple2((width / numRows) | 0, 0),
+				5,
+				height),
+				A3(
+				$joakin$elm_canvas$Canvas$rect,
+				_Utils_Tuple2(2 * ((width / numRows) | 0), 0),
+				5,
+				height),
+				A3(
+				$joakin$elm_canvas$Canvas$rect,
+				_Utils_Tuple2(0, (height / numRows) | 0),
+				width,
+				5),
+				A3(
+				$joakin$elm_canvas$Canvas$rect,
+				_Utils_Tuple2(0, 2 * ((height / numRows) | 0)),
+				width,
+				5)
+			]);
+	});
 var $joakin$elm_canvas$Canvas$Settings$Text$Center = {$: 'Center'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand = function (a) {
 	return {$: 'SettingCommand', a: a};
@@ -5663,12 +5664,11 @@ var $joakin$elm_canvas$Canvas$Settings$Text$font = function (_v0) {
 		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$font(
 			$elm$core$String$fromInt(size) + ('px ' + family)));
 };
+var $author$project$Main$getCoordinate = F4(
+	function (idx, width, height, numRows) {
+		return _Utils_Tuple2(((idx % numRows) * ((width / numRows) | 0)) + ((width / (2 * numRows)) | 0), (((idx / numRows) | 0) * ((width / numRows) | 0)) + (width / (2 * (numRows - 0.5))));
+	});
 var $elm$core$Debug$log = _Debug_log;
-var $author$project$Main$getCoordinate = function (idx) {
-	return _Utils_Tuple2(
-		((idx % 3) * 167) + 84,
-		(((A2($elm$core$Debug$log, 'index', idx) / 3) | 0) * 180) + 100);
-};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableText = function (a) {
 	return {$: 'DrawableText', a: a};
 };
@@ -5797,14 +5797,17 @@ var $joakin$elm_canvas$Canvas$text = F3(
 						{maxWidth: $elm$core$Maybe$Nothing, point: point, text: str})
 				}));
 	});
-var $author$project$Main$drawXorO = F2(
-	function (idx, player) {
+var $author$project$Main$drawXorO = F5(
+	function (model, width, height, idx, player) {
 		var settings = _List_fromArray(
 			[
 				$joakin$elm_canvas$Canvas$Settings$Text$font(
 				{family: 'sans-serif', size: 70}),
 				$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Center)
 			]);
+		var numRows = $elm$core$Basics$round(
+			$elm$core$Basics$sqrt(
+				$elm$core$Array$length(model.board)));
 		switch (player.$) {
 			case 'PlayerX':
 				return A3(
@@ -5813,13 +5816,13 @@ var $author$project$Main$drawXorO = F2(
 					A2(
 						$elm$core$Debug$log,
 						'xplayer coord',
-						$author$project$Main$getCoordinate(idx)),
+						A4($author$project$Main$getCoordinate, idx, width, height, numRows)),
 					'X');
 			case 'PlayerO':
 				return A3(
 					$joakin$elm_canvas$Canvas$text,
 					settings,
-					$author$project$Main$getCoordinate(idx),
+					A4($author$project$Main$getCoordinate, idx, width, height, numRows),
 					'O');
 			default:
 				return A3(
@@ -5867,10 +5870,14 @@ var $elm$core$Array$indexedMap = F2(
 			true,
 			A3($elm$core$Elm$JsArray$foldl, helper, initialBuilder, tree));
 	});
-var $author$project$Main$fillBoard = function (model) {
-	return $elm$core$Array$toList(
-		A2($elm$core$Array$indexedMap, $author$project$Main$drawXorO, model.board));
-};
+var $author$project$Main$fillBoard = F3(
+	function (width, height, model) {
+		return $elm$core$Array$toList(
+			A2(
+				$elm$core$Array$indexedMap,
+				A3($author$project$Main$drawXorO, model, width, height),
+				model.board));
+	});
 var $author$project$Main$notMaybePlayerToText = function (player) {
 	switch (player.$) {
 		case 'NoOne':
@@ -6261,7 +6268,6 @@ var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$core$Basics$round = _Basics_round;
 var $avh4$elm_color$Color$toCssString = function (_v0) {
 	var r = _v0.a;
 	var g = _v0.b;
@@ -6832,9 +6838,12 @@ var $author$project$Main$view = function (model) {
 									_Utils_Tuple2(0, 0),
 									width,
 									height),
-									A2($joakin$elm_canvas$Canvas$shapes, _List_Nil, $author$project$Main$drawGrid)
+									A2(
+									$joakin$elm_canvas$Canvas$shapes,
+									_List_Nil,
+									A3($author$project$Main$drawGrid, width, height, model))
 								]),
-							$author$project$Main$fillBoard(model)))
+							A3($author$project$Main$fillBoard, width, height, model)))
 					]))
 			]));
 };

@@ -1,4 +1,5 @@
 module Main exposing (main)
+import AIPlayer
 import Browser
 import Html exposing (Html, Attribute, div, input, text, button, option, select)
 import Html.Attributes exposing (..)
@@ -42,7 +43,7 @@ nextPlayer player =
 
 init : Model
 init = 
-    { board = Array.repeat 9 NoOne
+    { board = Array.repeat 16 NoOne
     , currentPlayer = PlayerX
     , message = ""
     }
@@ -144,17 +145,48 @@ checkPlayerWin player model =
   in -}
   -- write a function to generate this array generally
   let
-    idx_array = Array.fromList [Array.fromList[0,3,6]
+    idx_array = generateIdxArray model
+    {- idx_array = Array.fromList [Array.fromList[0,3,6]
       ,Array.fromList[1,4,7]
       ,Array.fromList[2,5,8]
       ,Array.fromList[0,1,2]
       ,Array.fromList[3,4,5]
       ,Array.fromList[6,7,8]
       ,Array.fromList[0,4,8]
-      ,Array.fromList[2,4,6]]
+      ,Array.fromList[2,4,6]] -}
   in
   Bool.Extra.any (Array.toList (Array.map (outerWinMap model.board) idx_array))
   
+generateIdxArray : Model -> Array.Array (Array.Array Int)
+generateIdxArray model =
+  let
+    baseArray = 
+      Array.initialize ( Array.length model.board |> toFloat |> Basics.sqrt |> Basics.round) identity
+    numberofArraysArray = Array.initialize (Array.length model.board |> toFloat |> Basics.sqrt |> (*) 2 |> (+) 2 |> Basics.round) identity
+    numberofRows = Array.length model.board |> toFloat |> Basics.sqrt |> Basics.round
+  in
+  Array.map (generateChildIdxArray baseArray numberofRows) numberofArraysArray
+
+generateChildIdxArray : Array.Array Int -> Int -> Int -> Array.Array Basics.Int
+generateChildIdxArray baseArr numberofRows idx =
+  -- you are making column skip index arrays
+  if idx < numberofRows then
+    Array.map (\i -> i*numberofRows + idx) baseArr
+
+  -- you are making row slices
+  else if idx < numberofRows * 2 then
+    Array.map (\i -> i + idx) baseArr
+
+  --diagonal top left to bottom right
+  else if idx == Array.length baseArr ^ 2 then
+    Array.map (\i -> i * (Array.length baseArr + 1) + Array.length baseArr + 1) baseArr
+
+  --diagonal top right to bottom left
+  else
+    Array.map (\i -> i*(Array.length baseArr - 1) + Array.length baseArr - 1) baseArr
+
+
+
 
 playerToText : Maybe.Maybe Player -> String
 playerToText player =
@@ -209,42 +241,45 @@ view model =
     []
     -- this is a sketch way of clearing the board and I think it should be better.
     ([ Canvas.clear (0, 0) width height, Canvas.shapes []
-    drawGrid
-    ] ++ fillBoard model)
+    (drawGrid width height model)
+    ] ++ fillBoard width height model)
     ]
   ]
 
 --implement a line drawing function 
-drawGrid : List Canvas.Shape
-drawGrid = 
-  --hardcoded for now should make reactive
-  [ Canvas.rect ( 167, 0 ) 5 500
-  , Canvas.rect ( 333, 0 ) 5 500
-  , Canvas.rect ( 0, 167 ) 500 5
-  , Canvas.rect ( 0, 333 ) 500 5
+drawGrid : Int -> Int -> Model -> List Canvas.Shape
+drawGrid width height model = 
+  let
+    numRows = Array.length model.board |> toFloat |> Basics.sqrt |> round
+  in
+  [ Canvas.rect ( width // numRows |> toFloat, 0 ) 5 ( toFloat height )
+  , Canvas.rect ( 2 * (width // numRows) |> toFloat, 0 ) 5 ( toFloat height )
+  , Canvas.rect ( 0, height // numRows |> toFloat) ( toFloat width ) 5
+  , Canvas.rect ( 0, 2 * (height // numRows) |> toFloat) ( toFloat width ) 5
   ]
 
-fillBoard : Model -> List Canvas.Renderable
-fillBoard model = 
-  Array.indexedMap drawXorO model.board |> Array.toList
+fillBoard : Int -> Int -> Model -> List Canvas.Renderable
+fillBoard width height model = 
+  Array.indexedMap (drawXorO model width height) model.board |> Array.toList
 
-drawXorO : Int -> Player -> Canvas.Renderable
-drawXorO idx player = 
+drawXorO : Model -> Int -> Int -> Int -> Player -> Canvas.Renderable
+drawXorO model width height idx player = 
   let
     settings = [ Canvas.Settings.Text.font {size = 70, family = "sans-serif"}, Canvas.Settings.Text.align Canvas.Settings.Text.Center]
+    numRows = Array.length model.board |> toFloat |> Basics.sqrt |> round
   in
   case player of
     PlayerX ->
-      Canvas.text settings (Debug.log "xplayer coord" (getCoordinate idx)) "X"
+      Canvas.text settings (Debug.log "xplayer coord" (getCoordinate idx width height numRows)) "X"
     PlayerO ->
-      Canvas.text settings (getCoordinate idx) "O"
+      Canvas.text settings (getCoordinate idx width height numRows) "O"
     NoOne ->
       Canvas.text settings ( 0, 0 ) ""
     
-getCoordinate : Int -> Canvas.Point
-getCoordinate idx =
-  ( (Basics.remainderBy 3 idx) * 167 + 84 |> toFloat
-  , ((Debug.log "index" idx) // 3) * 180 + 100 |> toFloat
+getCoordinate : Int -> Int -> Int -> Int -> Canvas.Point
+getCoordinate idx width height numRows =
+  ( (Basics.remainderBy numRows idx) * ( width // numRows ) + (width // (2 * numRows)) |> toFloat
+  , ((idx // numRows) * (width // numRows) |> toFloat) + ( (width |> toFloat) / (2 * ((numRows |> toFloat) - 0.5)))
   
    )
 --return zero when dividing zero by something
