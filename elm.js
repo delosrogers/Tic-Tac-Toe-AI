@@ -10819,47 +10819,19 @@ var $author$project$Main$updateBoard = F2(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'C0':
-				return A2($author$project$Main$updateBoard, 0, model);
-			case 'C1':
-				return A2($author$project$Main$updateBoard, 1, model);
-			case 'C2':
-				return A2($author$project$Main$updateBoard, 2, model);
-			case 'C3':
-				return A2($author$project$Main$updateBoard, 3, model);
-			case 'C4':
-				return A2($author$project$Main$updateBoard, 4, model);
-			case 'C5':
-				return A2($author$project$Main$updateBoard, 5, model);
-			case 'C6':
-				return A2($author$project$Main$updateBoard, 6, model);
-			case 'C7':
-				return A2($author$project$Main$updateBoard, 7, model);
-			case 'C8':
-				return A2($author$project$Main$updateBoard, 8, model);
-			case 'MouseClick':
-				var event = msg.a;
-				var _v1 = event.offsetPos;
-				var x = _v1.a;
-				var y = _v1.b;
-				return A2(
-					$author$project$Main$updateBoard,
-					(($elm$core$Basics$round(x) / 167) | 0) + (3 * (($elm$core$Basics$round(y) / 167) | 0)),
-					model);
-			default:
-				return $author$project$Main$init;
+		if (msg.$ === 'MouseClick') {
+			var event = msg.a;
+			var _v1 = event.offsetPos;
+			var x = _v1.a;
+			var y = _v1.b;
+			return A2(
+				$author$project$Main$updateBoard,
+				(($elm$core$Basics$round(x) / 167) | 0) + (3 * (($elm$core$Basics$round(y) / 167) | 0)),
+				model);
+		} else {
+			return $author$project$Main$init;
 		}
 	});
-var $author$project$Main$C0 = {$: 'C0'};
-var $author$project$Main$C1 = {$: 'C1'};
-var $author$project$Main$C2 = {$: 'C2'};
-var $author$project$Main$C3 = {$: 'C3'};
-var $author$project$Main$C4 = {$: 'C4'};
-var $author$project$Main$C5 = {$: 'C5'};
-var $author$project$Main$C6 = {$: 'C6'};
-var $author$project$Main$C7 = {$: 'C7'};
-var $author$project$Main$C8 = {$: 'C8'};
 var $author$project$Main$MouseClick = function (a) {
 	return {$: 'MouseClick', a: a};
 };
@@ -11299,23 +11271,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Main$playerToText = function (player) {
-	if (player.$ === 'Just') {
-		switch (player.a.$) {
-			case 'NoOne':
-				var _v1 = player.a;
-				return '';
-			case 'PlayerO':
-				var _v2 = player.a;
-				return 'O';
-			default:
-				var _v3 = player.a;
-				return 'X';
-		}
-	} else {
-		return '';
-	}
-};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes = function (a) {
 	return {$: 'DrawableShapes', a: a};
 };
@@ -12051,141 +12006,6 @@ var $author$project$Main$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C0)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 0, model.board)))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C1)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 1, model.board)))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C2)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 2, model.board)))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C3)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 3, model.board)))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C4)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 4, model.board)))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C5)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 5, model.board)))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C6)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 6, model.board)))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C7)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 7, model.board)))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game_button'),
-								$elm$html$Html$Events$onClick($author$project$Main$C8)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Main$playerToText(
-									A2($elm$core$Array$get, 8, model.board)))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
 						$elm$html$Html$text(model.message)
 					])),
 				A2(
@@ -12217,4 +12037,4 @@ var $author$project$Main$view = function (model) {
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
 	{init: $author$project$Main$init, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Html.Events.Extra.Mouse.Event":{"args":[],"type":"{ keys : Html.Events.Extra.Mouse.Keys, button : Html.Events.Extra.Mouse.Button, clientPos : ( Basics.Float, Basics.Float ), offsetPos : ( Basics.Float, Basics.Float ), pagePos : ( Basics.Float, Basics.Float ), screenPos : ( Basics.Float, Basics.Float ) }"},"Html.Events.Extra.Mouse.Keys":{"args":[],"type":"{ alt : Basics.Bool, ctrl : Basics.Bool, shift : Basics.Bool }"}},"unions":{"Main.Msg":{"args":[],"tags":{"C0":[],"C1":[],"C2":[],"C3":[],"C4":[],"C5":[],"C6":[],"C7":[],"C8":[],"Reset":[],"MouseClick":["Html.Events.Extra.Mouse.Event"]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Html.Events.Extra.Mouse.Button":{"args":[],"tags":{"ErrorButton":[],"MainButton":[],"MiddleButton":[],"SecondButton":[],"BackButton":[],"ForwardButton":[]}},"Basics.Float":{"args":[],"tags":{"Float":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Html.Events.Extra.Mouse.Event":{"args":[],"type":"{ keys : Html.Events.Extra.Mouse.Keys, button : Html.Events.Extra.Mouse.Button, clientPos : ( Basics.Float, Basics.Float ), offsetPos : ( Basics.Float, Basics.Float ), pagePos : ( Basics.Float, Basics.Float ), screenPos : ( Basics.Float, Basics.Float ) }"},"Html.Events.Extra.Mouse.Keys":{"args":[],"type":"{ alt : Basics.Bool, ctrl : Basics.Bool, shift : Basics.Bool }"}},"unions":{"Main.Msg":{"args":[],"tags":{"Reset":[],"MouseClick":["Html.Events.Extra.Mouse.Event"]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Html.Events.Extra.Mouse.Button":{"args":[],"tags":{"ErrorButton":[],"MainButton":[],"MiddleButton":[],"SecondButton":[],"BackButton":[],"ForwardButton":[]}},"Basics.Float":{"args":[],"tags":{"Float":[]}}}}})}});}(this));

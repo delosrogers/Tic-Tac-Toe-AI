@@ -52,7 +52,7 @@ init =
 
 
 type Msg
-    = C0 | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | Reset | MouseClick Mouse.Event
+    = Reset | MouseClick Mouse.Event
 {- checkWinAndUpdate : Model -> Model
 checkWinAndUpdate model =
   if checkWin model then
@@ -66,25 +66,6 @@ update : Msg -> Model -> Model
 update msg model =
   
   case msg of
-  -- C stands for cell this nomenclature could be improved
-    C0 ->
-      updateBoard 0 model
-    C1->
-      updateBoard 1 model
-    C2->
-      updateBoard 2 model
-    C3->
-      updateBoard 3 model
-    C4->
-      updateBoard 4 model
-    C5->
-      updateBoard 5 model
-    C6->
-      updateBoard 6 model
-    C7->
-      updateBoard 7 model
-    C8->
-      updateBoard 8 model
     MouseClick event ->
       let
         ( x, y ) = event.offsetPos
@@ -228,21 +209,6 @@ view model =
     ([ Canvas.clear (0, 0) width height, Canvas.shapes []
     (drawGrid width height model)
     ] ++ fillBoard width height model)
-    ]
-    , div [] 
-    [ button [ class "game_button", onClick C0] [text (playerToText (Array.get 0 model.board))]
-    , button [ class "game_button", onClick C1] [text (playerToText (Array.get 1 model.board))]
-    , button [ class "game_button", onClick C2] [text (playerToText (Array.get 2 model.board))]
-    ]
-    , div [] [
-      button [ class "game_button", onClick C3] [text (playerToText (Array.get 3 model.board))]
-    , button [ class "game_button", onClick C4] [text (playerToText (Array.get 4 model.board))]
-    , button [ class "game_button", onClick C5] [text (playerToText (Array.get 5 model.board))]
-    ]
-    , div [] 
-    [ button [ class "game_button", onClick C6] [text (playerToText (Array.get 6 model.board))]
-    , button [ class "game_button", onClick C7] [text (playerToText (Array.get 7 model.board))]
-    , button [ class "game_button", onClick C8] [text (playerToText (Array.get 8 model.board))]
     ]
     , div [] 
     [ text model.message
