@@ -52,15 +52,9 @@ init =
 
 
 type Msg
-    = Reset | MouseClick Mouse.Event
-{- checkWinAndUpdate : Model -> Model
-checkWinAndUpdate model =
-  if checkWin model then
-        case model.turn of
-          PlayerO -> "Player O wins" 
-          PlayerX -> "Player X wins"
-  else
-    "" -}
+    = Reset 
+    | MouseClick Mouse.Event
+
 
 update : Msg -> Model -> Model
 update msg model =
@@ -253,7 +247,7 @@ drawXorO model width height idx player =
 getCoordinate : Int -> Int -> Int -> Int -> Canvas.Point
 getCoordinate idx width height numRows =
   ( (Basics.remainderBy numRows idx) * ( width // numRows ) + (width // (2 * numRows)) |> toFloat
-  , ((idx // numRows) * (width // numRows) |> toFloat) + ( (width |> toFloat) / (2 * ((numRows |> toFloat) - 0.5)))
+  , ((idx // numRows) * (height // numRows) |> toFloat) + ( (height |> toFloat) / (2 * ((numRows |> toFloat) - 0.5)))
   
    )
 --return zero when dividing zero by something

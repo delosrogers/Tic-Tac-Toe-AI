@@ -10948,7 +10948,7 @@ var $joakin$elm_canvas$Canvas$Settings$Text$font = function (_v0) {
 };
 var $author$project$Main$getCoordinate = F4(
 	function (idx, width, height, numRows) {
-		return _Utils_Tuple2(((idx % numRows) * ((width / numRows) | 0)) + ((width / (2 * numRows)) | 0), (((idx / numRows) | 0) * ((width / numRows) | 0)) + (width / (2 * (numRows - 0.5))));
+		return _Utils_Tuple2(((idx % numRows) * ((width / numRows) | 0)) + ((width / (2 * numRows)) | 0), (((idx / numRows) | 0) * ((height / numRows) | 0)) + (height / (2 * (numRows - 0.5))));
 	});
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableText = function (a) {
 	return {$: 'DrawableText', a: a};
