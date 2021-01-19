@@ -208,28 +208,8 @@ generateChildIdxArray baseArr numberofRows idx =
         Array.map (\i -> i * (Array.length baseArr - 1) + Array.length baseArr - 1) baseArr
 
 
-playerToText : Maybe.Maybe Player -> String
+playerToText : Player -> String
 playerToText player =
-    case player of
-        Just NoOne ->
-            ""
-
-        Just PlayerO ->
-            "O"
-
-        Just PlayerX ->
-            "X"
-
-        Nothing ->
-            ""
-
-
-
---handles the case where Player is not nothing
-
-
-notMaybePlayerToText : Player -> String
-notMaybePlayerToText player =
     case player of
         NoOne ->
             ""
@@ -267,7 +247,7 @@ view model =
             [ text model.message
             ]
         , div []
-            [ text ("current player: " ++ notMaybePlayerToText model.currentPlayer)
+            [ text ("current player: " ++ playerToText model.currentPlayer)
             ]
         , div []
             [ button [ onClick Reset ] [ text "Reset Game" ] ]

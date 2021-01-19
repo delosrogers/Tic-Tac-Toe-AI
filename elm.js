@@ -11158,16 +11158,6 @@ var $author$project$Main$fillBoard = F3(
 				A3($author$project$Main$drawXorO, model, width, height),
 				model.board));
 	});
-var $author$project$Main$notMaybePlayerToText = function (player) {
-	switch (player.$) {
-		case 'NoOne':
-			return '';
-		case 'PlayerO':
-			return 'O';
-		default:
-			return 'X';
-	}
-};
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {preventDefault: true, stopPropagation: false};
 var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
@@ -11271,6 +11261,16 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $author$project$Main$playerToText = function (player) {
+	switch (player.$) {
+		case 'NoOne':
+			return '';
+		case 'PlayerO':
+			return 'O';
+		default:
+			return 'X';
+	}
+};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes = function (a) {
 	return {$: 'DrawableShapes', a: a};
 };
@@ -12014,7 +12014,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						'current player: ' + $author$project$Main$notMaybePlayerToText(model.currentPlayer))
+						'current player: ' + $author$project$Main$playerToText(model.currentPlayer))
 					])),
 				A2(
 				$elm$html$Html$div,
