@@ -1,5 +1,5 @@
 module AIPlayer exposing (bestMove)
-import Main exposing (..)
+--import Main exposing (..)
 import Basics exposing (..)
 import Array
 import Iter
@@ -43,6 +43,8 @@ nextBestScore board depth isMaximizing currentMoveAndScore =
         currentMoveAndScore
 
 
-miniMax : Int -> Bool -> Board
+miniMax : Int -> Bool -> Board -> Int
 miniMax depth isMaximizing board =
+    if Main.checkPlayerWin 
+    Tuple.second (Iter.head(Iter.drop 8 (Iter.iter (nextBestScore Board (depth + 1) isMaximizing) (0,0))))
 

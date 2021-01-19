@@ -1,20 +1,20 @@
 module Main exposing (main)
-import AIPlayer
+--import AIPlayer
 import Browser
 import Html exposing (Html, Attribute, div, input, text, button, option, select)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
+import Html.Events.Extra.Mouse as Mouse
 import String
 import List
 import Array
+import Array.Extra
 import Maybe
 import Bool.Extra
 import Debug
 import Canvas
 import Canvas.Settings
 import Canvas.Settings.Text
-import Color
-import Array exposing (indexedMap)
 
 
 main = 
@@ -31,6 +31,7 @@ type alias Model =
     { board : Board
     , currentPlayer : Player
     , message : String
+    , mousepos : ( Float,  Float )
     }
   
 nextPlayer : Player -> Player
@@ -43,14 +44,15 @@ nextPlayer player =
 
 init : Model
 init = 
-    { board = Array.repeat 16 NoOne
+    { board = Array.repeat 9 NoOne
     , currentPlayer = PlayerX
     , message = ""
+    , mousepos = ( 0, 0 )
     }
 
 
 type Msg
-    = C0 | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | Reset
+    = C0 | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | Reset | MouseClick Mouse.Event
 {- checkWinAndUpdate : Model -> Model
 checkWinAndUpdate model =
   if checkWin model then
@@ -83,6 +85,13 @@ update msg model =
       updateBoard 7 model
     C8->
       updateBoard 8 model
+    MouseClick event ->
+      let
+        ( x, y ) = event.offsetPos
+      in
+      -- TODO remove hardcoded values that lock this to being just a 3 by 3 board 500 px by 500 px
+      updateBoard ( (x |> Basics.round) // 167 + ( (y |> Basics.round) // 167 |> ((*) 3) )) model
+
     Reset ->
       init
 
@@ -124,46 +133,43 @@ outerWinMap gameArr idxes =
     slicedArr = Array.map (innerWinMap gameArr) idxes
   in
     -- this is somewhere that will need to be adjusted for different sized boards, this should be general
-    equal3 slicedArr
+    equal3 (Debug.log "sliced Arr in outerWinMap" slicedArr)
 
 checkWinandOutput : Model -> String
 checkWinandOutput model = 
-  let
-    playerXWin = checkPlayerWin PlayerX model
-  in
-  if playerXWin then
-    "Player X won"
-  else if (checkPlayerWin PlayerO model) then
-    "Player O won"
+  if checkPlayerWin model.board then
+    case model.currentPlayer of
+       PlayerX -> "Player X won"
+       PlayerO -> "Player O won"
+       NoOne -> ""
+  else if not (Bool.Extra.any (Array.Extra.mapToList (\player -> player == NoOne) model.board)) then
+    "tie"
   else
     ""
 
-checkPlayerWin : Player -> Model -> Bool
-checkPlayerWin player model =
+checkPlayerWin : Board -> Bool
+checkPlayerWin board =
   {- let  
     curriedwinCheckCols = winCheckCols (sqrt (Array.length model.board)) player
   in -}
   -- write a function to generate this array generally
   let
-    idx_array = generateIdxArray model
-    {- idx_array = Array.fromList [Array.fromList[0,3,6]
-      ,Array.fromList[1,4,7]
-      ,Array.fromList[2,5,8]
-      ,Array.fromList[0,1,2]
-      ,Array.fromList[3,4,5]
-      ,Array.fromList[6,7,8]
-      ,Array.fromList[0,4,8]
-      ,Array.fromList[2,4,6]] -}
+    idx_array = generateIdxArray board
   in
-  Bool.Extra.any (Array.toList (Array.map (outerWinMap model.board) idx_array))
+  Bool.Extra.any (Array.toList (Array.map (outerWinMap (Debug.log "board in checkplayerwin" board)) (Debug.log "idx_array" idx_array)))
   
-generateIdxArray : Model -> Array.Array (Array.Array Int)
-generateIdxArray model =
+generateIdxArray : Board -> Array.Array (Array.Array Int)
+generateIdxArray board =
   let
+    -- An array that is 0,1,2 ... the length of a row/col
     baseArray = 
-      Array.initialize ( Array.length model.board |> toFloat |> Basics.sqrt |> Basics.round) identity
-    numberofArraysArray = Array.initialize (Array.length model.board |> toFloat |> Basics.sqrt |> (*) 2 |> (+) 2 |> Basics.round) identity
-    numberofRows = Array.length model.board |> toFloat |> Basics.sqrt |> Basics.round
+      Array.initialize ( Array.length board |> toFloat |> Basics.sqrt |> Basics.round) identity
+    
+    -- an array 0,1,2 ... that is the number of rows + cols + diagonals
+    numberofArraysArray = Array.initialize (Array.length board |> toFloat |> Basics.sqrt |> (*) 2 |> (+) 2 |> Basics.round) identity
+    
+    -- the number of rows
+    numberofRows = Array.length board |> toFloat |> Basics.sqrt |> Basics.round
   in
   Array.map (generateChildIdxArray baseArray numberofRows) numberofArraysArray
 
@@ -174,12 +180,13 @@ generateChildIdxArray baseArr numberofRows idx =
     Array.map (\i -> i*numberofRows + idx) baseArr
 
   -- you are making row slices
-  else if idx < numberofRows * 2 then
-    Array.map (\i -> i + idx) baseArr
+  else if idx < (numberofRows * 2) then
+    Array.map (\i -> i + (idx - numberofRows) * numberofRows) baseArr
 
   --diagonal top left to bottom right
-  else if idx == Array.length baseArr ^ 2 then
-    Array.map (\i -> i * (Array.length baseArr + 1) + Array.length baseArr + 1) baseArr
+  else if idx == Array.length baseArr * 2 then
+  -- figure out exactly what I'm doing here and why it works
+    Array.map (\i -> i * (Array.length baseArr + 1) + Array.length baseArr + 1 - numberofRows - 1) baseArr
 
   --diagonal top right to bottom left
   else
@@ -213,7 +220,16 @@ view model =
         height = 500
   in
   div [] [
-    div [] 
+    div [] []
+    , div [Mouse.onDown MouseClick] [
+        Canvas.toHtml ( width, height )
+    []
+    -- this is a sketch way of clearing the board and I think it should be better.
+    ([ Canvas.clear (0, 0) width height, Canvas.shapes []
+    (drawGrid width height model)
+    ] ++ fillBoard width height model)
+    ]
+    , div [] 
     [ button [ class "game_button", onClick C0] [text (playerToText (Array.get 0 model.board))]
     , button [ class "game_button", onClick C1] [text (playerToText (Array.get 1 model.board))]
     , button [ class "game_button", onClick C2] [text (playerToText (Array.get 2 model.board))]
@@ -236,14 +252,6 @@ view model =
     ]
     , div []
     [ button [onClick Reset] [text "Reset Game"]]
-    , div [] [
-        Canvas.toHtml ( width, height )
-    []
-    -- this is a sketch way of clearing the board and I think it should be better.
-    ([ Canvas.clear (0, 0) width height, Canvas.shapes []
-    (drawGrid width height model)
-    ] ++ fillBoard width height model)
-    ]
   ]
 
 --implement a line drawing function 
