@@ -70,33 +70,29 @@ bestMove board =
             Array.toList board
     in
     --returns a tuple of bestmove and best score
-    (bestMoveLoop bestScore 0 boardList (List.range 0 8)) |> Tuple.first
+    List.foldl (bestMoveReduce boardList) ( 0, bestScore ) (List.range 0 8) |> Tuple.first
 
 
-bestMoveLoop : Int -> Int -> List Player -> List Int -> ( Int, Int )
-bestMoveLoop bestScore bestMoveInLoop board iteratingList =
-    if Maybe.withDefault NoOne (List.Extra.getAt (Maybe.withDefault 0 (List.head iteratingList)) board) == NoOne then
+bestMoveReduce : List Player -> Int -> ( Int, Int ) -> ( Int, Int )
+bestMoveReduce board currentMove ( bestMoveInReduce, bestScore ) =
+    if Maybe.withDefault NoOne (List.Extra.getAt currentMove board) == NoOne && bestScore <= 5 then
         let
             score =
                 miniMax
-                    (List.Extra.setAt (Maybe.withDefault 0 (List.head iteratingList)) PlayerX board)
+                    (List.Extra.setAt currentMove PlayerX board)
                     0
                     False
         in
-        if List.length iteratingList <= 1 && score > bestScore then
-            ( Maybe.withDefault 0 (List.head iteratingList), score )
+        ( if score > bestScore then
+            currentMove
 
-        else if List.length iteratingList <= 1 then
-            ( bestMoveInLoop, bestScore )
-
-        else if score > bestScore then
-            bestMoveLoop score (Maybe.withDefault 0 (List.head iteratingList)) board (Maybe.withDefault [] (List.tail iteratingList))
-
-        else
-            bestMoveLoop bestScore bestMoveInLoop board (Maybe.withDefault [] (List.tail iteratingList))
+          else
+            bestMoveInReduce
+        , max score bestScore
+        )
 
     else
-        bestMoveLoop bestScore bestMoveInLoop board (Maybe.withDefault [] (List.tail iteratingList))
+        ( bestMoveInReduce, bestScore )
 
 
 miniMax : List Player -> Int -> Bool -> Int
@@ -106,24 +102,47 @@ miniMax board depth isMaximizing =
             0
 
         else if isMaximizing then
-            10
+            -10
 
         else
-            -10
+            10
 
     else if isMaximizing then
         let
             bestScore =
                 -1 / 0 |> Basics.round
         in
-        miniMaxLoop bestScore depth board isMaximizing (List.range 0 8)
+        List.foldl (miniMaxReduce depth board isMaximizing) bestScore (List.range 0 8)
 
     else
         let
             bestScore =
                 1 / 0 |> Basics.round
         in
-        miniMaxLoop bestScore depth board isMaximizing (List.range 0 8)
+        List.foldl (miniMaxReduce depth board isMaximizing) bestScore (List.range 0 8)
+
+
+miniMaxReduce : Int -> List Player -> Bool -> Int -> Int -> Int
+miniMaxReduce depth board isMaximizing idx bestScore =
+    if Maybe.withDefault NoOne (List.Extra.getAt idx board) == NoOne then
+        let
+            score =
+                miniMax
+                    (List.Extra.setAt idx (isMaximizingtoPlayer isMaximizing) board)
+                    (depth + 1)
+                    (not isMaximizing)
+        in
+        if isMaximizing && bestScore < 5 then
+            max score bestScore
+
+        else if not isMaximizing && bestScore > -5 then
+            min score bestScore
+
+        else
+            bestScore
+
+    else
+        bestScore
 
 
 isMaximizingtoPlayer : Bool -> Player
@@ -133,30 +152,3 @@ isMaximizingtoPlayer isMaximizing =
 
     else
         PlayerO
-
-
-miniMaxLoop : Int -> Int -> List Player -> Bool -> List Int -> Int
-miniMaxLoop bestScore depth board isMaximizing iteratingList =
-    if Maybe.withDefault NoOne (List.Extra.getAt (Maybe.withDefault 0 (List.head iteratingList)) board) == NoOne then
-        let
-            score =
-                miniMax
-                    (List.Extra.setAt (Maybe.withDefault 0 (List.head iteratingList)) (isMaximizingtoPlayer isMaximizing) board)
-                    (depth + 1)
-                    (not isMaximizing)
-        in
-        if List.length iteratingList <= 1 then
-            if isMaximizing then
-                max score bestScore
-
-            else
-                min score bestScore
-
-        else if isMaximizing then
-            miniMaxLoop (max bestScore score) depth board isMaximizing (Maybe.withDefault [] (List.tail iteratingList))
-
-        else
-            miniMaxLoop (min bestScore score) depth board isMaximizing (Maybe.withDefault [] (List.tail iteratingList))
-
-    else
-        miniMaxLoop bestScore depth board isMaximizing (Maybe.withDefault [] (List.tail iteratingList))

@@ -5191,7 +5191,7 @@ var $author$project$Main$init = {
 	ai: true,
 	board: $elm$core$Array$fromList(
 		_List_fromArray(
-			[$author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$PlayerX, $author$project$Types$PlayerX, $author$project$Types$PlayerO, $author$project$Types$PlayerX, $author$project$Types$PlayerO, $author$project$Types$NoOne])),
+			[$author$project$Types$PlayerX, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne])),
 	currentPlayer: $author$project$Types$PlayerO,
 	message: '',
 	mousepos: _Utils_Tuple2(0, 0)
@@ -10568,6 +10568,7 @@ var $elm$browser$Browser$sandbox = function (impl) {
 		});
 };
 var $elm$core$Basics$round = _Basics_round;
+var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $elm$core$Array$setHelp = F4(
 	function (shift, index, value, tree) {
 		var pos = $elm$core$Array$bitMask & (index >>> shift);
@@ -10612,12 +10613,17 @@ var $elm$core$Array$set = F3(
 	});
 var $author$project$GameLogic$boardSet = F3(
 	function (idx, value, arr) {
-		return _Utils_eq(
-			A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Types$NoOne,
-				A2($elm$core$Array$get, idx, arr)),
-			$author$project$Types$NoOne) ? A3($elm$core$Array$set, idx, value, arr) : arr;
+		if (idx.$ === 'Just') {
+			var index = idx.a;
+			return _Utils_eq(
+				A2(
+					$elm$core$Maybe$withDefault,
+					$author$project$Types$NoOne,
+					A2($elm$core$Array$get, index, arr)),
+				$author$project$Types$NoOne) ? A3($elm$core$Array$set, index, value, arr) : arr;
+		} else {
+			return arr;
+		}
 	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -10692,7 +10698,6 @@ var $author$project$GameLogic$generateChildIdxArray = F3(
 			},
 			baseArr)));
 	});
-var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $author$project$GameLogic$generateIdxArray = function (board) {
 	var numberofRows = $elm$core$Basics$round(
 		$elm$core$Basics$sqrt(
@@ -10981,257 +10986,137 @@ var $elm_community$list_extra$List$Extra$setAt = F2(
 			index,
 			$elm$core$Basics$always(value));
 	});
-var $elm$core$List$tail = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(xs);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $author$project$AIPlayer$miniMax = F3(
 	function (board, depth, isMaximizing) {
 		if ($author$project$GameLogic$checkWin(
 			$elm$core$Array$fromList(board))) {
-			return (!A2($elm$core$List$member, $author$project$Types$NoOne, board)) ? 0 : (isMaximizing ? 10 : (-10));
+			return (!A2($elm$core$List$member, $author$project$Types$NoOne, board)) ? 0 : (isMaximizing ? (-10) : 10);
 		} else {
 			if (isMaximizing) {
 				var bestScore = $elm$core$Basics$round((-1) / 0);
-				return A5(
-					$author$project$AIPlayer$miniMaxLoop,
+				return A3(
+					$elm$core$List$foldl,
+					A3($author$project$AIPlayer$miniMaxReduce, depth, board, isMaximizing),
 					bestScore,
-					depth,
-					board,
-					isMaximizing,
 					A2($elm$core$List$range, 0, 8));
 			} else {
 				var bestScore = $elm$core$Basics$round(1 / 0);
-				return A5(
-					$author$project$AIPlayer$miniMaxLoop,
+				return A3(
+					$elm$core$List$foldl,
+					A3($author$project$AIPlayer$miniMaxReduce, depth, board, isMaximizing),
 					bestScore,
-					depth,
-					board,
-					isMaximizing,
 					A2($elm$core$List$range, 0, 8));
 			}
 		}
 	});
-var $author$project$AIPlayer$miniMaxLoop = F5(
-	function (bestScore, depth, board, isMaximizing, iteratingList) {
-		miniMaxLoop:
-		while (true) {
-			if (_Utils_eq(
-				A2(
-					$elm$core$Maybe$withDefault,
-					$author$project$Types$NoOne,
-					A2(
-						$elm_community$list_extra$List$Extra$getAt,
-						A2(
-							$elm$core$Maybe$withDefault,
-							0,
-							$elm$core$List$head(iteratingList)),
-						board)),
-				$author$project$Types$NoOne)) {
-				var score = A3(
-					$author$project$AIPlayer$miniMax,
-					A3(
-						$elm_community$list_extra$List$Extra$setAt,
-						A2(
-							$elm$core$Maybe$withDefault,
-							0,
-							$elm$core$List$head(iteratingList)),
-						$author$project$AIPlayer$isMaximizingtoPlayer(isMaximizing),
-						board),
-					depth + 1,
-					!isMaximizing);
-				if ($elm$core$List$length(iteratingList) <= 1) {
-					return isMaximizing ? A2($elm$core$Basics$max, score, bestScore) : A2($elm$core$Basics$min, score, bestScore);
-				} else {
-					if (isMaximizing) {
-						var $temp$bestScore = A2($elm$core$Basics$max, bestScore, score),
-							$temp$depth = depth,
-							$temp$board = board,
-							$temp$isMaximizing = isMaximizing,
-							$temp$iteratingList = A2(
-							$elm$core$Maybe$withDefault,
-							_List_Nil,
-							$elm$core$List$tail(iteratingList));
-						bestScore = $temp$bestScore;
-						depth = $temp$depth;
-						board = $temp$board;
-						isMaximizing = $temp$isMaximizing;
-						iteratingList = $temp$iteratingList;
-						continue miniMaxLoop;
-					} else {
-						var $temp$bestScore = A2($elm$core$Basics$min, bestScore, score),
-							$temp$depth = depth,
-							$temp$board = board,
-							$temp$isMaximizing = isMaximizing,
-							$temp$iteratingList = A2(
-							$elm$core$Maybe$withDefault,
-							_List_Nil,
-							$elm$core$List$tail(iteratingList));
-						bestScore = $temp$bestScore;
-						depth = $temp$depth;
-						board = $temp$board;
-						isMaximizing = $temp$isMaximizing;
-						iteratingList = $temp$iteratingList;
-						continue miniMaxLoop;
-					}
-				}
-			} else {
-				var $temp$bestScore = bestScore,
-					$temp$depth = depth,
-					$temp$board = board,
-					$temp$isMaximizing = isMaximizing,
-					$temp$iteratingList = A2(
-					$elm$core$Maybe$withDefault,
-					_List_Nil,
-					$elm$core$List$tail(iteratingList));
-				bestScore = $temp$bestScore;
-				depth = $temp$depth;
-				board = $temp$board;
-				isMaximizing = $temp$isMaximizing;
-				iteratingList = $temp$iteratingList;
-				continue miniMaxLoop;
-			}
+var $author$project$AIPlayer$miniMaxReduce = F5(
+	function (depth, board, isMaximizing, idx, bestScore) {
+		if (_Utils_eq(
+			A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Types$NoOne,
+				A2($elm_community$list_extra$List$Extra$getAt, idx, board)),
+			$author$project$Types$NoOne)) {
+			var score = A3(
+				$author$project$AIPlayer$miniMax,
+				A3(
+					$elm_community$list_extra$List$Extra$setAt,
+					idx,
+					$author$project$AIPlayer$isMaximizingtoPlayer(isMaximizing),
+					board),
+				depth + 1,
+				!isMaximizing);
+			return (isMaximizing && (bestScore < 5)) ? A2($elm$core$Basics$max, score, bestScore) : (((!isMaximizing) && (_Utils_cmp(bestScore, -5) > 0)) ? A2($elm$core$Basics$min, score, bestScore) : bestScore);
+		} else {
+			return bestScore;
 		}
 	});
-var $author$project$AIPlayer$bestMoveLoop = F4(
-	function (bestScore, bestMoveInLoop, board, iteratingList) {
-		bestMoveLoop:
-		while (true) {
-			if (_Utils_eq(
-				A2(
-					$elm$core$Maybe$withDefault,
-					$author$project$Types$NoOne,
-					A2(
-						$elm_community$list_extra$List$Extra$getAt,
-						A2(
-							$elm$core$Maybe$withDefault,
-							0,
-							$elm$core$List$head(iteratingList)),
-						board)),
-				$author$project$Types$NoOne)) {
-				var score = A3(
-					$author$project$AIPlayer$miniMax,
-					A3(
-						$elm_community$list_extra$List$Extra$setAt,
-						A2(
-							$elm$core$Maybe$withDefault,
-							0,
-							$elm$core$List$head(iteratingList)),
-						$author$project$Types$PlayerX,
-						board),
-					0,
-					false);
-				if (($elm$core$List$length(iteratingList) <= 1) && (_Utils_cmp(score, bestScore) > 0)) {
-					return _Utils_Tuple2(
-						A2(
-							$elm$core$Maybe$withDefault,
-							0,
-							$elm$core$List$head(iteratingList)),
-						score);
-				} else {
-					if ($elm$core$List$length(iteratingList) <= 1) {
-						return _Utils_Tuple2(bestMoveInLoop, bestScore);
-					} else {
-						if (_Utils_cmp(score, bestScore) > 0) {
-							var $temp$bestScore = score,
-								$temp$bestMoveInLoop = A2(
-								$elm$core$Maybe$withDefault,
-								0,
-								$elm$core$List$head(iteratingList)),
-								$temp$board = board,
-								$temp$iteratingList = A2(
-								$elm$core$Maybe$withDefault,
-								_List_Nil,
-								$elm$core$List$tail(iteratingList));
-							bestScore = $temp$bestScore;
-							bestMoveInLoop = $temp$bestMoveInLoop;
-							board = $temp$board;
-							iteratingList = $temp$iteratingList;
-							continue bestMoveLoop;
-						} else {
-							var $temp$bestScore = bestScore,
-								$temp$bestMoveInLoop = bestMoveInLoop,
-								$temp$board = board,
-								$temp$iteratingList = A2(
-								$elm$core$Maybe$withDefault,
-								_List_Nil,
-								$elm$core$List$tail(iteratingList));
-							bestScore = $temp$bestScore;
-							bestMoveInLoop = $temp$bestMoveInLoop;
-							board = $temp$board;
-							iteratingList = $temp$iteratingList;
-							continue bestMoveLoop;
-						}
-					}
-				}
-			} else {
-				var $temp$bestScore = bestScore,
-					$temp$bestMoveInLoop = bestMoveInLoop,
-					$temp$board = board,
-					$temp$iteratingList = A2(
-					$elm$core$Maybe$withDefault,
-					_List_Nil,
-					$elm$core$List$tail(iteratingList));
-				bestScore = $temp$bestScore;
-				bestMoveInLoop = $temp$bestMoveInLoop;
-				board = $temp$board;
-				iteratingList = $temp$iteratingList;
-				continue bestMoveLoop;
-			}
+var $author$project$AIPlayer$bestMoveReduce = F3(
+	function (board, currentMove, _v0) {
+		var bestMoveInReduce = _v0.a;
+		var bestScore = _v0.b;
+		if (_Utils_eq(
+			A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Types$NoOne,
+				A2($elm_community$list_extra$List$Extra$getAt, currentMove, board)),
+			$author$project$Types$NoOne) && (bestScore <= 5)) {
+			var score = A3(
+				$author$project$AIPlayer$miniMax,
+				A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board),
+				0,
+				false);
+			return _Utils_Tuple2(
+				(_Utils_cmp(score, bestScore) > 0) ? currentMove : bestMoveInReduce,
+				A2($elm$core$Basics$max, score, bestScore));
+		} else {
+			return _Utils_Tuple2(bestMoveInReduce, bestScore);
 		}
 	});
 var $author$project$AIPlayer$bestMove = function (board) {
 	var boardList = $elm$core$Array$toList(board);
 	var bestScore = $elm$core$Basics$round((-1) / 0);
-	return A4(
-		$author$project$AIPlayer$bestMoveLoop,
-		bestScore,
-		0,
-		boardList,
+	return A3(
+		$elm$core$List$foldl,
+		$author$project$AIPlayer$bestMoveReduce(boardList),
+		_Utils_Tuple2(0, bestScore),
 		A2($elm$core$List$range, 0, 8)).a;
 };
-var $author$project$Main$useAIPlayer = F2(
-	function (model, humanMove) {
-		return (model.ai && _Utils_eq(model.currentPlayer, $author$project$Types$PlayerX)) ? $author$project$AIPlayer$bestMove(model.board) : humanMove;
+var $author$project$Main$useAIPlayer = F3(
+	function (model, humanMove, aiPlay) {
+		return (model.ai && (_Utils_eq(model.currentPlayer, $author$project$Types$PlayerX) && aiPlay)) ? $elm$core$Maybe$Just(
+			$author$project$AIPlayer$bestMove(model.board)) : (_Utils_eq(model.currentPlayer, $author$project$Types$PlayerO) ? $elm$core$Maybe$Just(humanMove) : $elm$core$Maybe$Nothing);
 	});
-var $author$project$Main$updateBoard = F2(
-	function (cell, model) {
+var $author$project$Main$updateBoard = F3(
+	function (cell, model, aiPlay) {
 		var tmpModel = _Utils_update(
 			model,
 			{
 				board: A3(
 					$author$project$GameLogic$boardSet,
-					A2($author$project$Main$useAIPlayer, model, cell),
+					A3(
+						$author$project$Main$useAIPlayer,
+						model,
+						A2($elm$core$Debug$log, 'cell', cell),
+						aiPlay),
 					model.currentPlayer,
 					model.board)
 			});
-		return (model.message === '') ? _Utils_update(
+		return (model.message === '') ? ((aiPlay && _Utils_eq(model.currentPlayer, $author$project$Types$PlayerX)) ? _Utils_update(
 			tmpModel,
 			{
 				currentPlayer: $author$project$GameLogic$nextPlayer(model.currentPlayer),
 				message: $author$project$GameLogic$checkWinandOutput(tmpModel)
-			}) : model;
+			}) : (((!aiPlay) && _Utils_eq(model.currentPlayer, $author$project$Types$PlayerO)) ? _Utils_update(
+			tmpModel,
+			{
+				currentPlayer: $author$project$GameLogic$nextPlayer(model.currentPlayer),
+				message: $author$project$GameLogic$checkWinandOutput(tmpModel)
+			}) : model)) : model;
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'MouseClick') {
-			var event = msg.a;
-			var _v1 = event.offsetPos;
-			var x = _v1.a;
-			var y = _v1.b;
-			return A2(
-				$author$project$Main$updateBoard,
-				(($elm$core$Basics$round(x) / 167) | 0) + (3 * (($elm$core$Basics$round(y) / 167) | 0)),
-				model);
-		} else {
-			return $author$project$Main$init;
+		switch (msg.$) {
+			case 'MouseClick':
+				var event = msg.a;
+				var numRows = $elm$core$Basics$round(
+					$elm$core$Basics$sqrt(
+						$elm$core$Array$length(model.board)));
+				var _v1 = event.offsetPos;
+				var x = _v1.a;
+				var y = _v1.b;
+				return A3(
+					$author$project$Main$updateBoard,
+					(($elm$core$Basics$round(x) / 167) | 0) + (numRows * (($elm$core$Basics$round(y) / 167) | 0)),
+					model,
+					false);
+			case 'AIPlay':
+				return A3($author$project$Main$updateBoard, 0, model, true);
+			default:
+				return $author$project$Main$init;
 		}
 	});
+var $author$project$Main$AIPlay = {$: 'AIPlay'};
 var $author$project$Main$MouseClick = function (a) {
 	return {$: 'MouseClick', a: a};
 };
@@ -11668,7 +11553,7 @@ var $author$project$Main$playerToText = function (player) {
 		case 'PlayerO':
 			return 'O';
 		default:
-			return 'X';
+			return 'X: AI';
 	}
 };
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes = function (a) {
@@ -12430,6 +12315,16 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text('Reset Game')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$AIPlay)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('let the AI player make a move')
 							]))
 					]))
 			]));
@@ -12437,4 +12332,4 @@ var $author$project$Main$view = function (model) {
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
 	{init: $author$project$Main$init, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Html.Events.Extra.Mouse.Event":{"args":[],"type":"{ keys : Html.Events.Extra.Mouse.Keys, button : Html.Events.Extra.Mouse.Button, clientPos : ( Basics.Float, Basics.Float ), offsetPos : ( Basics.Float, Basics.Float ), pagePos : ( Basics.Float, Basics.Float ), screenPos : ( Basics.Float, Basics.Float ) }"},"Html.Events.Extra.Mouse.Keys":{"args":[],"type":"{ alt : Basics.Bool, ctrl : Basics.Bool, shift : Basics.Bool }"}},"unions":{"Main.Msg":{"args":[],"tags":{"Reset":[],"MouseClick":["Html.Events.Extra.Mouse.Event"]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Html.Events.Extra.Mouse.Button":{"args":[],"tags":{"ErrorButton":[],"MainButton":[],"MiddleButton":[],"SecondButton":[],"BackButton":[],"ForwardButton":[]}},"Basics.Float":{"args":[],"tags":{"Float":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Html.Events.Extra.Mouse.Event":{"args":[],"type":"{ keys : Html.Events.Extra.Mouse.Keys, button : Html.Events.Extra.Mouse.Button, clientPos : ( Basics.Float, Basics.Float ), offsetPos : ( Basics.Float, Basics.Float ), pagePos : ( Basics.Float, Basics.Float ), screenPos : ( Basics.Float, Basics.Float ) }"},"Html.Events.Extra.Mouse.Keys":{"args":[],"type":"{ alt : Basics.Bool, ctrl : Basics.Bool, shift : Basics.Bool }"}},"unions":{"Main.Msg":{"args":[],"tags":{"Reset":[],"MouseClick":["Html.Events.Extra.Mouse.Event"],"AIPlay":[]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Html.Events.Extra.Mouse.Button":{"args":[],"tags":{"ErrorButton":[],"MainButton":[],"MiddleButton":[],"SecondButton":[],"BackButton":[],"ForwardButton":[]}},"Basics.Float":{"args":[],"tags":{"Float":[]}}}}})}});}(this));

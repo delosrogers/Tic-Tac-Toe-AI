@@ -2,8 +2,6 @@ module Main exposing (main)
 
 import AIPlayer
 import Array
-import Array.Extra
-import Bool.Extra
 import Browser
 import Canvas
 import Canvas.Settings
@@ -14,9 +12,6 @@ import Html exposing (Attribute, Html, button, div, input, option, select, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Events.Extra.Mouse as Mouse
-import List
-import Maybe
-import String
 import Types exposing (..)
 
 
@@ -26,7 +21,7 @@ main =
 
 init : Model
 init =
-    { board = Array.fromList [NoOne, NoOne, NoOne, PlayerX, PlayerX, PlayerO, PlayerX, PlayerO, NoOne]
+    { board = Array.fromList [ PlayerX, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne ]
     , currentPlayer = PlayerO
     , message = ""
     , mousepos = ( 0, 0 )
@@ -37,6 +32,7 @@ init =
 type Msg
     = Reset
     | MouseClick Mouse.Event
+    | AIPlay
 
 
 update : Msg -> Model -> Model
@@ -46,34 +42,51 @@ update msg model =
             let
                 ( x, y ) =
                     event.offsetPos
+                numRows = Array.length model.board |> toFloat |> sqrt |> round
             in
             -- TODO remove hardcoded values that lock this to being just a 3 by 3 board 500 px by 500 px
-            updateBoard ((x |> Basics.round) // 167 + ((y |> Basics.round) // 167 |> (*) 3)) model
+            updateBoard ((x |> Basics.round) // 167 + ((y |> Basics.round) // 167 |> (*) numRows)) model False
+
+        AIPlay ->
+            updateBoard 0 model True
 
         Reset ->
             init
 
 
-useAIPlayer : Model -> Int -> Int
-useAIPlayer model humanMove =
-    if model.ai && model.currentPlayer == PlayerX then
-        AIPlayer.bestMove model.board
+useAIPlayer : Model -> Int -> Bool -> Maybe.Maybe Int
+useAIPlayer model humanMove aiPlay =
+    if model.ai && model.currentPlayer == PlayerX && aiPlay then
+        Just (AIPlayer.bestMove model.board)
+
+    else if model.currentPlayer == PlayerO then
+        Just humanMove
 
     else
-        humanMove
+        Maybe.Nothing
 
 
-updateBoard : Int -> Model -> Model
-updateBoard cell model =
+updateBoard : Int -> Model -> Bool -> Model
+updateBoard cell model aiPlay =
     let
         tmpModel =
-            { model | board = boardSet (useAIPlayer model cell) model.currentPlayer model.board }
+            { model | board = boardSet (useAIPlayer model (Debug.log "cell" cell) aiPlay) model.currentPlayer model.board }
     in
     if model.message == "" then
-        { tmpModel
-            | message = checkWinandOutput tmpModel
-            , currentPlayer = nextPlayer model.currentPlayer
-        }
+        if aiPlay && model.currentPlayer == PlayerX then
+            { tmpModel
+                | message = checkWinandOutput tmpModel
+                , currentPlayer = nextPlayer model.currentPlayer
+            }
+
+        else if not aiPlay && model.currentPlayer == PlayerO then
+            { tmpModel
+                | message = checkWinandOutput tmpModel
+                , currentPlayer = nextPlayer model.currentPlayer
+            }
+
+        else
+            model
 
     else
         model
@@ -89,7 +102,7 @@ playerToText player =
             "O"
 
         PlayerX ->
-            "X"
+            "X: AI"
 
 
 view : Model -> Html Msg
@@ -121,7 +134,7 @@ view model =
             [ text ("current player: " ++ playerToText model.currentPlayer)
             ]
         , div []
-            [ button [ onClick Reset ] [ text "Reset Game" ] ]
+            [ button [ onClick Reset ] [ text "Reset Game" ], button [ onClick AIPlay ] [ text "let the AI player make a move" ] ]
         ]
 
 

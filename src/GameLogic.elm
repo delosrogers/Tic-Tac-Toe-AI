@@ -1,5 +1,6 @@
 module GameLogic exposing (..)
 
+import Maybe
 import Array
 import Array.Extra
 import Bool.Extra
@@ -19,13 +20,17 @@ nextPlayer player =
             NoOne
 
 
-boardSet : Int -> Player -> Array.Array Player -> Array.Array Player
+boardSet : Maybe.Maybe Int -> Player -> Array.Array Player -> Array.Array Player
 boardSet idx value arr =
-    if Maybe.withDefault NoOne (Array.get idx arr) == NoOne then
-        Array.set idx value arr
+    case idx of
+        Just index ->
+            if Maybe.withDefault NoOne (Array.get index arr) == NoOne then
+                Array.set index value arr
 
-    else
-        arr
+            else
+                arr
+        Maybe.Nothing ->
+            arr
 
 
 equal3 : Array.Array Player -> Bool
