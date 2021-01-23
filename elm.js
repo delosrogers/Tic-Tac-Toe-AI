@@ -80,6 +80,87 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEBUG mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
 
 
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -709,87 +790,6 @@ function _Utils_ap(xs, ys)
 	}
 	return root;
 }
-
-
-
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -4938,6 +4938,8 @@ function _Browser_load(url)
 		}
 	}));
 }
+var $elm$core$Basics$EQ = {$: 'EQ'};
+var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
@@ -5015,9 +5017,7 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$keys(dict);
 };
-var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
-var $elm$core$Basics$LT = {$: 'LT'};
 var $author$project$Types$NoOne = {$: 'NoOne'};
 var $author$project$Types$PlayerO = {$: 'PlayerO'};
 var $author$project$Types$PlayerX = {$: 'PlayerX'};
@@ -5187,11 +5187,35 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
+var $elm$core$Basics$le = _Utils_le;
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
 var $author$project$Main$init = {
 	ai: true,
 	board: $elm$core$Array$fromList(
-		_List_fromArray(
-			[$author$project$Types$PlayerX, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne, $author$project$Types$NoOne])),
+		A2(
+			$elm$core$List$cons,
+			$author$project$Types$PlayerX,
+			A2($elm$core$List$repeat, 8, $author$project$Types$NoOne))),
 	currentPlayer: $author$project$Types$PlayerO,
 	message: '',
 	mousepos: _Utils_Tuple2(0, 0)
@@ -5256,7 +5280,6 @@ var $elm$core$List$length = function (xs) {
 		xs);
 };
 var $elm$core$List$map2 = _List_map2;
-var $elm$core$Basics$le = _Utils_le;
 var $elm$core$List$rangeHelp = F3(
 	function (lo, hi, list) {
 		rangeHelp:
@@ -10720,21 +10743,25 @@ var $author$project$GameLogic$generateIdxArray = function (board) {
 		numberofArraysArray);
 };
 var $elm$core$Debug$log = _Debug_log;
-var $author$project$GameLogic$equal3 = function (arr) {
-	var get = $elm$core$Array$get;
-	return (!_Utils_eq(
-		A2(
-			$elm$core$Maybe$withDefault,
-			$author$project$Types$NoOne,
-			A2(get, 0, arr)),
-		$author$project$Types$NoOne)) ? (_Utils_eq(
-		A2(get, 0, arr),
-		A2(get, 1, arr)) && (_Utils_eq(
-		A2(get, 1, arr),
-		A2(get, 2, arr)) && _Utils_eq(
-		A2(get, 0, arr),
-		A2(get, 2, arr)))) : false;
-};
+var $author$project$GameLogic$equalAll = F3(
+	function (list, lastBool, lastElement) {
+		equalAll:
+		while (true) {
+			if (!list.b) {
+				return lastBool;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				var $temp$list = xs,
+					$temp$lastBool = lastBool && (_Utils_eq(lastElement, x) && (!_Utils_eq(x, $author$project$Types$NoOne))),
+					$temp$lastElement = x;
+				list = $temp$list;
+				lastBool = $temp$lastBool;
+				lastElement = $temp$lastElement;
+				continue equalAll;
+			}
+		}
+	});
 var $author$project$GameLogic$innerWinMap = F2(
 	function (gameArr, idx) {
 		return A2(
@@ -10748,8 +10775,14 @@ var $author$project$GameLogic$outerWinMap = F2(
 			$elm$core$Array$map,
 			$author$project$GameLogic$innerWinMap(gameArr),
 			idxes);
-		return $author$project$GameLogic$equal3(
-			A2($elm$core$Debug$log, 'sliced Arr in outerWinMap', slicedArr));
+		return A3(
+			$author$project$GameLogic$equalAll,
+			$elm$core$Array$toList(slicedArr),
+			true,
+			A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Types$NoOne,
+				A2($elm$core$Array$get, 0, slicedArr)));
 	});
 var $author$project$GameLogic$checkWin = function (board) {
 	var idx_array = $author$project$GameLogic$generateIdxArray(board);
@@ -10998,14 +11031,20 @@ var $author$project$AIPlayer$miniMax = F3(
 					$elm$core$List$foldl,
 					A3($author$project$AIPlayer$miniMaxReduce, depth, board, isMaximizing),
 					bestScore,
-					A2($elm$core$List$range, 0, 8));
+					A2(
+						$elm$core$List$range,
+						0,
+						$elm$core$List$length(board) - 1));
 			} else {
 				var bestScore = $elm$core$Basics$round(1 / 0);
 				return A3(
 					$elm$core$List$foldl,
 					A3($author$project$AIPlayer$miniMaxReduce, depth, board, isMaximizing),
 					bestScore,
-					A2($elm$core$List$range, 0, 8));
+					A2(
+						$elm$core$List$range,
+						0,
+						$elm$core$List$length(board) - 1));
 			}
 		}
 	});
@@ -11017,16 +11056,33 @@ var $author$project$AIPlayer$miniMaxReduce = F5(
 				$author$project$Types$NoOne,
 				A2($elm_community$list_extra$List$Extra$getAt, idx, board)),
 			$author$project$Types$NoOne)) {
-			var score = A3(
-				$author$project$AIPlayer$miniMax,
-				A3(
-					$elm_community$list_extra$List$Extra$setAt,
-					idx,
-					$author$project$AIPlayer$isMaximizingtoPlayer(isMaximizing),
-					board),
-				depth + 1,
-				!isMaximizing);
-			return (isMaximizing && (bestScore < 5)) ? A2($elm$core$Basics$max, score, bestScore) : (((!isMaximizing) && (_Utils_cmp(bestScore, -5) > 0)) ? A2($elm$core$Basics$min, score, bestScore) : bestScore);
+			if (isMaximizing && (bestScore < 5)) {
+				var score = A3(
+					$author$project$AIPlayer$miniMax,
+					A3(
+						$elm_community$list_extra$List$Extra$setAt,
+						idx,
+						$author$project$AIPlayer$isMaximizingtoPlayer(isMaximizing),
+						board),
+					depth + 1,
+					!isMaximizing);
+				return A2($elm$core$Basics$max, score, bestScore);
+			} else {
+				if ((!isMaximizing) && (_Utils_cmp(bestScore, -5) > 0)) {
+					var score = A3(
+						$author$project$AIPlayer$miniMax,
+						A3(
+							$elm_community$list_extra$List$Extra$setAt,
+							idx,
+							$author$project$AIPlayer$isMaximizingtoPlayer(isMaximizing),
+							board),
+						depth + 1,
+						!isMaximizing);
+					return A2($elm$core$Basics$min, score, bestScore);
+				} else {
+					return bestScore;
+				}
+			}
 		} else {
 			return bestScore;
 		}
@@ -11060,7 +11116,10 @@ var $author$project$AIPlayer$bestMove = function (board) {
 		$elm$core$List$foldl,
 		$author$project$AIPlayer$bestMoveReduce(boardList),
 		_Utils_Tuple2(0, bestScore),
-		A2($elm$core$List$range, 0, 8)).a;
+		A2(
+			$elm$core$List$range,
+			0,
+			$elm$core$Array$length(board) - 1)).a;
 };
 var $author$project$Main$useAIPlayer = F3(
 	function (model, humanMove, aiPlay) {
@@ -11107,7 +11166,7 @@ var $author$project$Main$update = F2(
 				var y = _v1.b;
 				return A3(
 					$author$project$Main$updateBoard,
-					(($elm$core$Basics$round(x) / 167) | 0) + (numRows * (($elm$core$Basics$round(y) / 167) | 0)),
+					(($elm$core$Basics$round(x) / ((500 / numRows) | 0)) | 0) + (numRows * (($elm$core$Basics$round(y) / ((500 / numRows) | 0)) | 0)),
 					model,
 					false);
 			case 'AIPlay':

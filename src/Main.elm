@@ -8,9 +8,9 @@ import Canvas.Settings
 import Canvas.Settings.Text
 import Debug
 import GameLogic exposing (..)
-import Html exposing (Attribute, Html, button, div, input, option, select, text)
+import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
 import Types exposing (..)
 
@@ -21,7 +21,7 @@ main =
 
 init : Model
 init =
-    { board = Array.fromList [ PlayerX, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne, NoOne ]
+    { board = Array.fromList (PlayerX :: List.repeat 8 NoOne)
     , currentPlayer = PlayerO
     , message = ""
     , mousepos = ( 0, 0 )
@@ -42,10 +42,12 @@ update msg model =
             let
                 ( x, y ) =
                     event.offsetPos
-                numRows = Array.length model.board |> toFloat |> sqrt |> round
+
+                numRows =
+                    Array.length model.board |> toFloat |> sqrt |> round
             in
             -- TODO remove hardcoded values that lock this to being just a 3 by 3 board 500 px by 500 px
-            updateBoard ((x |> Basics.round) // 167 + ((y |> Basics.round) // 167 |> (*) numRows)) model False
+            updateBoard ((x |> Basics.round) // (500 // numRows) + ((y |> Basics.round) // (500 // numRows) |> (*) numRows)) model False
 
         AIPlay ->
             updateBoard 0 model True

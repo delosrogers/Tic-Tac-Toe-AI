@@ -1,9 +1,10 @@
 module GameLogic exposing (..)
 
-import Maybe
+import List
 import Array
 import Array.Extra
 import Bool.Extra
+import Maybe
 import Types exposing (..)
 
 
@@ -29,21 +30,17 @@ boardSet idx value arr =
 
             else
                 arr
+
         Maybe.Nothing ->
             arr
 
 
-equal3 : Array.Array Player -> Bool
-equal3 arr =
-    let
-        get =
-            Array.get
-    in
-    if Maybe.withDefault NoOne (get 0 arr) /= NoOne then
-        get 0 arr == get 1 arr && get 1 arr == get 2 arr && get 0 arr == get 2 arr
-
-    else
-        False
+equalAll : List Player -> Bool -> Player -> Bool
+equalAll list lastBool lastElement =
+    case list of
+        [] -> lastBool
+        x::xs ->
+            equalAll xs ( lastBool && lastElement == x && x /= NoOne) x
 
 
 innerWinMap : Array.Array Player -> Int -> Player
@@ -58,7 +55,7 @@ outerWinMap gameArr idxes =
             Array.map (innerWinMap gameArr) idxes
     in
     -- this is somewhere that will need to be adjusted for different sized boards, this should be general
-    equal3 (Debug.log "sliced Arr in outerWinMap" slicedArr)
+    equalAll (Array.toList slicedArr) True (Maybe.withDefault NoOne ( Array.get 0 slicedArr ))
 
 
 checkWinandOutput : Model -> String

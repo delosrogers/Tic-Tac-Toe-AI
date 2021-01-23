@@ -1,12 +1,8 @@
 module AIPlayer exposing (bestMove)
 
---import Main exposing (..)
-
 import Array
 import Basics exposing (..)
 import GameLogic exposing (..)
-import Html.Attributes exposing (ismap)
-import Iter
 import List
 import List.Extra
 import Maybe
@@ -70,7 +66,7 @@ bestMove board =
             Array.toList board
     in
     --returns a tuple of bestmove and best score
-    List.foldl (bestMoveReduce boardList) ( 0, bestScore ) (List.range 0 8) |> Tuple.first
+    List.foldl (bestMoveReduce boardList) ( 0, bestScore ) (List.range 0 (Array.length board - 1)) |> Tuple.first
 
 
 bestMoveReduce : List Player -> Int -> ( Int, Int ) -> ( Int, Int )
@@ -112,30 +108,37 @@ miniMax board depth isMaximizing =
             bestScore =
                 -1 / 0 |> Basics.round
         in
-        List.foldl (miniMaxReduce depth board isMaximizing) bestScore (List.range 0 8)
+        List.foldl (miniMaxReduce depth board isMaximizing) bestScore (List.range 0 (List.length board - 1))
 
     else
         let
             bestScore =
                 1 / 0 |> Basics.round
         in
-        List.foldl (miniMaxReduce depth board isMaximizing) bestScore (List.range 0 8)
+        List.foldl (miniMaxReduce depth board isMaximizing) bestScore (List.range 0 (List.length board - 1))
 
 
 miniMaxReduce : Int -> List Player -> Bool -> Int -> Int -> Int
 miniMaxReduce depth board isMaximizing idx bestScore =
     if Maybe.withDefault NoOne (List.Extra.getAt idx board) == NoOne then
-        let
-            score =
-                miniMax
-                    (List.Extra.setAt idx (isMaximizingtoPlayer isMaximizing) board)
-                    (depth + 1)
-                    (not isMaximizing)
-        in
         if isMaximizing && bestScore < 5 then
+            let
+                score =
+                    miniMax
+                        (List.Extra.setAt idx (isMaximizingtoPlayer isMaximizing) board)
+                        (depth + 1)
+                        (not isMaximizing)
+            in
             max score bestScore
 
         else if not isMaximizing && bestScore > -5 then
+            let
+                score =
+                    miniMax
+                        (List.Extra.setAt idx (isMaximizingtoPlayer isMaximizing) board)
+                        (depth + 1)
+                        (not isMaximizing)
+            in
             min score bestScore
 
         else

@@ -1,6 +1,7 @@
 module Types exposing (..)
 
 import Array
+import Tree
 
 
 type alias Model =
@@ -20,3 +21,7 @@ type Player
 
 type alias Board =
     Array.Array Player
+
+
+type alias GameTree =
+    Tree.Tree ( Board, Int )
