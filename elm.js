@@ -11427,29 +11427,30 @@ var $author$project$Main$drawGrid = F3(
 		var numRows = $elm$core$Basics$round(
 			$elm$core$Basics$sqrt(
 				$elm$core$Array$length(model.board)));
-		return _List_fromArray(
-			[
-				A3(
-				$joakin$elm_canvas$Canvas$rect,
-				_Utils_Tuple2((width / numRows) | 0, 0),
-				5,
-				height),
-				A3(
-				$joakin$elm_canvas$Canvas$rect,
-				_Utils_Tuple2(2 * ((width / numRows) | 0), 0),
-				5,
-				height),
-				A3(
-				$joakin$elm_canvas$Canvas$rect,
-				_Utils_Tuple2(0, (height / numRows) | 0),
-				width,
-				5),
-				A3(
-				$joakin$elm_canvas$Canvas$rect,
-				_Utils_Tuple2(0, 2 * ((height / numRows) | 0)),
-				width,
-				5)
-			]);
+		return $elm$core$List$concat(
+			_List_fromArray(
+				[
+					A2(
+					$elm$core$List$map,
+					function (i) {
+						return A3(
+							$joakin$elm_canvas$Canvas$rect,
+							_Utils_Tuple2(i * ((width / numRows) | 0), 0),
+							5,
+							height);
+					},
+					A2($elm$core$List$range, 1, numRows)),
+					A2(
+					$elm$core$List$map,
+					function (i) {
+						return A3(
+							$joakin$elm_canvas$Canvas$rect,
+							_Utils_Tuple2(0, i * ((height / numRows) | 0)),
+							width,
+							5);
+					},
+					A2($elm$core$List$range, 1, numRows))
+				]));
 	});
 var $joakin$elm_canvas$Canvas$Settings$Text$Center = {$: 'Center'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand = function (a) {

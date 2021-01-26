@@ -167,11 +167,17 @@ drawGrid width height model =
         numRows =
             Array.length model.board |> toFloat |> Basics.sqrt |> round
     in
-    [ Canvas.rect ( width // numRows |> toFloat, 0 ) 5 (toFloat height)
+
+    List.concat [
+        List.map (\i -> Canvas.rect ( i * (width // numRows) |> toFloat, 0) 5 (toFloat height)) (List.range 1 numRows)
+        , List.map (\i -> Canvas.rect (0, i *(height//numRows) |> toFloat) (toFloat width) 5) (List.range 1 numRows)
+    ]
+    
+   {-  [ Canvas.rect ( width // numRows |> toFloat, 0 ) 5 (toFloat height)
     , Canvas.rect ( 2 * (width // numRows) |> toFloat, 0 ) 5 (toFloat height)
     , Canvas.rect ( 0, height // numRows |> toFloat ) (toFloat width) 5
     , Canvas.rect ( 0, 2 * (height // numRows) |> toFloat ) (toFloat width) 5
-    ]
+    ] -}
 
 
 fillBoard : Int -> Int -> Model -> List Canvas.Renderable
