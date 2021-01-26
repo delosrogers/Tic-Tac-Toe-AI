@@ -134,11 +134,11 @@ generateChildIdxArray : Array.Array Int -> Int -> Int -> Array.Array Basics.Int
 generateChildIdxArray baseArr numberofRows idx =
     -- you are making column skip index arrays
     if idx < numberofRows then
-        Array.map (\i -> i * numberofRows + idx) baseArr
+        Array.map (\i -> i + idx * numberofRows) baseArr
         -- you are making row slices
 
     else if idx < (numberofRows * 2) then
-        Array.map (\i -> i + (idx - numberofRows) * numberofRows) baseArr
+        Array.map (\i -> i * numberofRows + (idx - numberofRows)) baseArr
         --diagonal top left to bottom right
 
     else if idx == Array.length baseArr * 2 then

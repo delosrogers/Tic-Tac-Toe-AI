@@ -5215,7 +5215,7 @@ var $author$project$Main$init = {
 		A2(
 			$elm$core$List$cons,
 			$author$project$Types$PlayerX,
-			A2($elm$core$List$repeat, 15, $author$project$Types$NoOne))),
+			A2($elm$core$List$repeat, 8, $author$project$Types$NoOne))),
 	currentPlayer: $author$project$Types$PlayerO,
 	message: '',
 	mousepos: _Utils_Tuple2(0, 0)
@@ -10711,12 +10711,12 @@ var $author$project$GameLogic$generateChildIdxArray = F3(
 		return (_Utils_cmp(idx, numberofRows) < 0) ? A2(
 			$elm$core$Array$map,
 			function (i) {
-				return (i * numberofRows) + idx;
+				return i + (idx * numberofRows);
 			},
 			baseArr) : ((_Utils_cmp(idx, numberofRows * 2) < 0) ? A2(
 			$elm$core$Array$map,
 			function (i) {
-				return i + ((idx - numberofRows) * numberofRows);
+				return (i * numberofRows) + (idx - numberofRows);
 			},
 			baseArr) : (_Utils_eq(
 			idx,
@@ -10753,8 +10753,6 @@ var $author$project$GameLogic$generateIdxArray = function (board) {
 		A2($author$project$GameLogic$generateChildIdxArray, baseArray, numberofRows),
 		numberofArraysArray);
 };
-<<<<<<< HEAD
-=======
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$List$member = F2(
 	function (x, xs) {
@@ -10765,7 +10763,6 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
->>>>>>> master
 var $author$project$GameLogic$equalAll = F3(
 	function (list, lastBool, lastElement) {
 		equalAll:
@@ -10823,15 +10820,6 @@ var $author$project$GameLogic$outerWinMap = F2(
 				A2($elm_community$list_extra$List$Extra$getAt, 0, slicedList))) ? $author$project$Types$Win : ((A2($elm$core$List$member, $author$project$Types$PlayerX, slicedList) && A2($elm$core$List$member, $author$project$Types$PlayerO, slicedList)) ? $author$project$Types$UnwinableRow : $author$project$Types$PlayContinues);
 	});
 var $author$project$GameLogic$checkWin = function (board) {
-<<<<<<< HEAD
-	var idx_array = $author$project$GameLogic$generateIdxArray(board);
-	return $Chadtech$elm_bool_extra$Bool$Extra$any(
-		$elm$core$Array$toList(
-			A2(
-				$elm$core$Array$map,
-				$author$project$GameLogic$outerWinMap(board),
-				idx_array)));
-=======
 	var winReportList = $elm$core$Array$toList(
 		A2(
 			$elm$core$Array$map,
@@ -10841,7 +10829,6 @@ var $author$project$GameLogic$checkWin = function (board) {
 		$elm$core$List$all,
 		$elm$core$Basics$eq($author$project$Types$UnwinableRow),
 		winReportList) ? A2($elm$core$Debug$log, 'tie', $author$project$Types$Tie) : $author$project$Types$PlayContinues);
->>>>>>> master
 };
 var $elm_community$array_extra$Array$Extra$mapToList = function (f) {
 	return A2(
@@ -10875,7 +10862,6 @@ var $author$project$GameLogic$checkWinandOutput = function (model) {
 		}
 	}
 };
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$GameLogic$nextPlayer = function (player) {
 	switch (player.$) {
 		case 'PlayerO':
@@ -10886,7 +10872,6 @@ var $author$project$GameLogic$nextPlayer = function (player) {
 			return $author$project$Types$NoOne;
 	}
 };
-<<<<<<< HEAD
 var $author$project$AIPlayer$boardListToString = F2(
 	function (string, board) {
 		boardListToString:
@@ -10918,29 +10903,6 @@ var $author$project$AIPlayer$boardListToString = F2(
 				}
 			}
 		}
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm_community$list_extra$List$Extra$getAt = F2(
-	function (idx, xs) {
-		return (idx < 0) ? $elm$core$Maybe$Nothing : $elm$core$List$head(
-			A2($elm$core$List$drop, idx, xs));
-	});
-=======
->>>>>>> master
-var $author$project$AIPlayer$isMaximizingtoPlayer = function (isMaximizing) {
-	return isMaximizing ? $author$project$Types$PlayerX : $author$project$Types$PlayerO;
-};
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
@@ -11068,6 +11030,93 @@ var $elm$core$List$take = F2(
 	function (n, list) {
 		return A3($elm$core$List$takeFast, 0, n, list);
 	});
+var $author$project$AIPlayer$splitList = function (board) {
+	var rowLength = $elm$core$Basics$round(
+		$elm$core$Basics$sqrt(
+			$elm$core$List$length(board)));
+	return A2(
+		$elm$core$List$map,
+		function (idxArr) {
+			return $elm$core$Array$toList(
+				A2(
+					$elm$core$Array$map,
+					function (idx) {
+						return A2(
+							$elm$core$Maybe$withDefault,
+							$author$project$Types$NoOne,
+							A2($elm_community$list_extra$List$Extra$getAt, idx, board));
+					},
+					idxArr));
+		},
+		A2(
+			$elm$core$List$take,
+			rowLength,
+			$elm$core$Array$toList(
+				$author$project$GameLogic$generateIdxArray(
+					$elm$core$Array$fromList(board)))));
+};
+var $author$project$AIPlayer$getScoreWithIsomorphisms = F2(
+	function (board, scoreDict) {
+		var score0 = A2(
+			$elm$core$Dict$get,
+			A2($author$project$AIPlayer$boardListToString, '', board),
+			scoreDict);
+		if (score0.$ === 'Just') {
+			var aScore = score0.a;
+			return $elm$core$Maybe$Just(aScore);
+		} else {
+			var score1 = A2(
+				$elm$core$Dict$get,
+				A2(
+					$author$project$AIPlayer$boardListToString,
+					'',
+					$elm$core$List$reverse(board)),
+				scoreDict);
+			if (score1.$ === 'Just') {
+				var aScore = score1.a;
+				return $elm$core$Maybe$Just(aScore);
+			} else {
+				var score2 = A2(
+					$elm$core$Dict$get,
+					A2(
+						$author$project$AIPlayer$boardListToString,
+						'',
+						$elm$core$List$concat(
+							$elm$core$List$reverse(
+								$author$project$AIPlayer$splitList(board)))),
+					scoreDict);
+				if (score2.$ === 'Just') {
+					var aScore = score2.a;
+					return $elm$core$Maybe$Just(aScore);
+				} else {
+					var score3 = A2(
+						$elm$core$Dict$get,
+						A2(
+							$author$project$AIPlayer$boardListToString,
+							'',
+							$elm$core$List$concat(
+								A2(
+									$elm$core$List$map,
+									$elm$core$List$reverse,
+									$author$project$AIPlayer$splitList(board)))),
+						scoreDict);
+					if (score3.$ === 'Just') {
+						var aScore = score3.a;
+						return $elm$core$Maybe$Just(aScore);
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				}
+			}
+		}
+	});
+var $author$project$AIPlayer$isMaximizingtoPlayer = function (isMaximizing) {
+	return isMaximizing ? $author$project$Types$PlayerX : $author$project$Types$PlayerO;
+};
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
 var $elm_community$list_extra$List$Extra$updateAt = F3(
 	function (index, fn, list) {
 		if (index < 0) {
@@ -11096,20 +11145,38 @@ var $elm_community$list_extra$List$Extra$setAt = F2(
 			index,
 			$elm$core$Basics$always(value));
 	});
-var $author$project$AIPlayer$miniMax = F3(
-	function (board, depth, isMaximizing) {
+var $author$project$AIPlayer$miniMax = F4(
+	function (board, depth, isMaximizing, scoreDict) {
 		if (_Utils_eq(
 			$author$project$GameLogic$checkWin(
 				$elm$core$Array$fromList(board)),
 			$author$project$Types$Win)) {
-			return (!A2($elm$core$List$member, $author$project$Types$NoOne, board)) ? 0 : (isMaximizing ? (-10) : 10);
+			return (!A2($elm$core$List$member, $author$project$Types$NoOne, board)) ? _Utils_Tuple2(
+				A3(
+					$elm$core$Dict$insert,
+					A2($author$project$AIPlayer$boardListToString, '', board),
+					0,
+					scoreDict),
+				0) : (isMaximizing ? _Utils_Tuple2(
+				A3(
+					$elm$core$Dict$insert,
+					A2($author$project$AIPlayer$boardListToString, '', board),
+					-10,
+					scoreDict),
+				-10) : _Utils_Tuple2(
+				A3(
+					$elm$core$Dict$insert,
+					A2($author$project$AIPlayer$boardListToString, '', board),
+					10,
+					scoreDict),
+				10));
 		} else {
 			if (isMaximizing) {
 				var bestScore = $elm$core$Basics$round((-1) / 0);
 				return A3(
 					$elm$core$List$foldl,
 					A3($author$project$AIPlayer$miniMaxReduce, depth, board, isMaximizing),
-					bestScore,
+					_Utils_Tuple2(scoreDict, bestScore),
 					A2(
 						$elm$core$List$range,
 						0,
@@ -11119,7 +11186,7 @@ var $author$project$AIPlayer$miniMax = F3(
 				return A3(
 					$elm$core$List$foldl,
 					A3($author$project$AIPlayer$miniMaxReduce, depth, board, isMaximizing),
-					bestScore,
+					_Utils_Tuple2(scoreDict, bestScore),
 					A2(
 						$elm$core$List$range,
 						0,
@@ -11128,7 +11195,9 @@ var $author$project$AIPlayer$miniMax = F3(
 		}
 	});
 var $author$project$AIPlayer$miniMaxReduce = F5(
-	function (depth, board, isMaximizing, idx, bestScore) {
+	function (depth, board, isMaximizing, idx, _v0) {
+		var scoreDict = _v0.a;
+		var bestScore = _v0.b;
 		if (_Utils_eq(
 			A2(
 				$elm$core$Maybe$withDefault,
@@ -11136,8 +11205,18 @@ var $author$project$AIPlayer$miniMaxReduce = F5(
 				A2($elm_community$list_extra$List$Extra$getAt, idx, board)),
 			$author$project$Types$NoOne)) {
 			if (isMaximizing && (bestScore < 5)) {
-				var score = A3(
-					$author$project$AIPlayer$miniMax,
+				var _v1 = A4(
+					F4(
+						function (boardScoreDict, modifiedBoard, callDepth, callIsMaximizing) {
+							var existingScore = A2($author$project$AIPlayer$getScoreWithIsomorphisms, modifiedBoard, boardScoreDict);
+							if (existingScore.$ === 'Just') {
+								var aScore = existingScore.a;
+								return _Utils_Tuple2(scoreDict, aScore);
+							} else {
+								return A4($author$project$AIPlayer$miniMax, modifiedBoard, callDepth, callIsMaximizing, boardScoreDict);
+							}
+						}),
+					scoreDict,
 					A3(
 						$elm_community$list_extra$List$Extra$setAt,
 						idx,
@@ -11145,11 +11224,32 @@ var $author$project$AIPlayer$miniMaxReduce = F5(
 						board),
 					depth + 1,
 					!isMaximizing);
-				return A2($elm$core$Basics$max, score, bestScore);
+				var newScoreDict = _v1.a;
+				var score = _v1.b;
+				return _Utils_Tuple2(
+					A3(
+						$elm$core$Dict$insert,
+						A2(
+							$author$project$AIPlayer$boardListToString,
+							'',
+							A3($elm_community$list_extra$List$Extra$setAt, idx, $author$project$Types$PlayerX, board)),
+						score,
+						newScoreDict),
+					A2($elm$core$Basics$max, score, bestScore));
 			} else {
 				if ((!isMaximizing) && (_Utils_cmp(bestScore, -5) > 0)) {
-					var score = A3(
-						$author$project$AIPlayer$miniMax,
+					var _v3 = A4(
+						F4(
+							function (boardScoreDict, modifiedBoard, callDepth, callIsMaximizing) {
+								var existingScore = A2($author$project$AIPlayer$getScoreWithIsomorphisms, modifiedBoard, boardScoreDict);
+								if (existingScore.$ === 'Just') {
+									var aScore = existingScore.a;
+									return _Utils_Tuple2(boardScoreDict, aScore);
+								} else {
+									return A4($author$project$AIPlayer$miniMax, modifiedBoard, callDepth, callIsMaximizing, boardScoreDict);
+								}
+							}),
+						scoreDict,
 						A3(
 							$elm_community$list_extra$List$Extra$setAt,
 							idx,
@@ -11157,13 +11257,24 @@ var $author$project$AIPlayer$miniMaxReduce = F5(
 							board),
 						depth + 1,
 						!isMaximizing);
-					return A2($elm$core$Basics$min, score, bestScore);
+					var newScoreDict = _v3.a;
+					var score = _v3.b;
+					return _Utils_Tuple2(
+						A3(
+							$elm$core$Dict$insert,
+							A2(
+								$author$project$AIPlayer$boardListToString,
+								'',
+								A3($elm_community$list_extra$List$Extra$setAt, idx, $author$project$Types$PlayerX, board)),
+							score,
+							newScoreDict),
+						A2($elm$core$Basics$min, score, bestScore));
 				} else {
-					return bestScore;
+					return _Utils_Tuple2(scoreDict, bestScore);
 				}
 			}
 		} else {
-			return bestScore;
+			return _Utils_Tuple2(scoreDict, bestScore);
 		}
 	});
 var $author$project$AIPlayer$bestMoveReduce = F3(
@@ -11174,22 +11285,21 @@ var $author$project$AIPlayer$bestMoveReduce = F3(
 				$author$project$Types$NoOne,
 				A2($elm_community$list_extra$List$Extra$getAt, currentMove, board)),
 			$author$project$Types$NoOne) && (bestMoveBests.bestScore <= 5)) {
-			var score = A2(
+			var _v0 = A2(
 				F2(
 					function (scoreDict, modifiedBoard) {
-						var existingScore = A2(
-							$elm$core$Dict$get,
-							A2($author$project$AIPlayer$boardListToString, '', modifiedBoard),
-							scoreDict);
+						var existingScore = A2($author$project$AIPlayer$getScoreWithIsomorphisms, modifiedBoard, scoreDict);
 						if (existingScore.$ === 'Just') {
 							var aScore = existingScore.a;
-							return aScore;
+							return _Utils_Tuple2(scoreDict, aScore);
 						} else {
-							return A3($author$project$AIPlayer$miniMax, modifiedBoard, 0, false);
+							return A4($author$project$AIPlayer$miniMax, modifiedBoard, 0, false, scoreDict);
 						}
 					}),
 				bestMoveBests.dict,
 				A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board));
+			var newScoreDict = _v0.a;
+			var score = _v0.b;
 			return _Utils_update(
 				bestMoveBests,
 				{
@@ -11197,7 +11307,7 @@ var $author$project$AIPlayer$bestMoveReduce = F3(
 					bestScore: A2($elm$core$Basics$max, score, bestMoveBests.bestScore),
 					dict: A2(
 						$elm$core$Debug$log,
-						'tree',
+						'dict',
 						A3(
 							$elm$core$Dict$insert,
 							A2(
@@ -11205,7 +11315,7 @@ var $author$project$AIPlayer$bestMoveReduce = F3(
 								'',
 								A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board)),
 							score,
-							bestMoveBests.dict))
+							newScoreDict))
 				});
 		} else {
 			return bestMoveBests;

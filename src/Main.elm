@@ -21,7 +21,7 @@ main =
 
 init : Model
 init =
-    { board = Array.fromList (PlayerX :: List.repeat 15 NoOne)
+    { board = Array.fromList (PlayerX :: List.repeat 8 NoOne)
     , currentPlayer = PlayerO
     , message = ""
     , mousepos = ( 0, 0 )

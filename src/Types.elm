@@ -2,12 +2,9 @@ module Types exposing (..)
 
 import Array
 import Tree
-<<<<<<< HEAD
 import List
 import Dict
-=======
 import Array exposing (toIndexedList)
->>>>>>> master
 
 
 type alias Model =
