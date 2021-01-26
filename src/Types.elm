@@ -2,8 +2,12 @@ module Types exposing (..)
 
 import Array
 import Tree
+<<<<<<< HEAD
 import List
 import Dict
+=======
+import Array exposing (toIndexedList)
+>>>>>>> master
 
 
 type alias Model =
@@ -27,3 +31,12 @@ type alias Board =
 
 type alias ScoreDict =
     Dict.Dict String Int
+type alias GameTree =
+    Tree.Tree ( Board, Int )
+
+
+type WinReport 
+    = Win
+    | UnwinableRow
+    | Tie
+    | PlayContinues

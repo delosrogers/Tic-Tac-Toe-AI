@@ -21,7 +21,7 @@ main =
 
 init : Model
 init =
-    { board = Array.fromList (PlayerX :: List.repeat 8 NoOne)
+    { board = Array.fromList (PlayerX :: List.repeat 15 NoOne)
     , currentPlayer = PlayerO
     , message = ""
     , mousepos = ( 0, 0 )
@@ -33,6 +33,7 @@ type Msg
     = Reset
     | MouseClick Mouse.Event
     | AIPlay
+    | TogleAI
 
 
 update : Msg -> Model -> Model
@@ -55,6 +56,9 @@ update msg model =
         Reset ->
             init
 
+        TogleAI ->
+            { model | ai = not model.ai }
+
 
 useAIPlayer : Model -> Int -> Bool -> Maybe.Maybe Int
 useAIPlayer model humanMove aiPlay =
@@ -62,6 +66,9 @@ useAIPlayer model humanMove aiPlay =
         Just (AIPlayer.bestMove model.board)
 
     else if model.currentPlayer == PlayerO then
+        Just humanMove
+
+    else if not model.ai then
         Just humanMove
 
     else
@@ -81,7 +88,7 @@ updateBoard cell model aiPlay =
                 , currentPlayer = nextPlayer model.currentPlayer
             }
 
-        else if not aiPlay && model.currentPlayer == PlayerO then
+        else if not aiPlay then
             { tmpModel
                 | message = checkWinandOutput tmpModel
                 , currentPlayer = nextPlayer model.currentPlayer
@@ -136,7 +143,17 @@ view model =
             [ text ("current player: " ++ playerToText model.currentPlayer)
             ]
         , div []
-            [ button [ onClick Reset ] [ text "Reset Game" ], button [ onClick AIPlay ] [ text "let the AI player make a move" ] ]
+            [ button [ onClick Reset ] [ text "Reset Game" ]
+            , button [ onClick AIPlay ] [ text "let the AI player make a move" ]
+            , button [ onClick TogleAI ] [ text "Togle AI player" ]
+            , text
+                (if model.ai then
+                    "the AI is playing"
+
+                 else
+                    "the AI is not playing"
+                )
+            ]
         ]
 
 

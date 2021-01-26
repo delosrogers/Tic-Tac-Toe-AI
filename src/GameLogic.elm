@@ -4,6 +4,7 @@ import Array
 import Array.Extra
 import Bool.Extra
 import List
+import List.Extra
 import Maybe
 import Types exposing (..)
 
@@ -50,19 +51,29 @@ innerWinMap gameArr idx =
     Maybe.withDefault NoOne (Array.get idx gameArr)
 
 
-outerWinMap : Array.Array Player -> Array.Array Int -> Bool
+outerWinMap : Array.Array Player -> Array.Array Int -> WinReport
 outerWinMap gameArr idxes =
     let
-        slicedArr =
-            Array.map (innerWinMap gameArr) idxes
+        slicedList =
+            Array.toList (Array.map (innerWinMap gameArr) idxes)
     in
-    -- this is somewhere that will need to be adjusted for different sized boards, this should be general
-    equalAll (Array.toList slicedArr) True (Maybe.withDefault NoOne (Array.get 0 slicedArr))
+    if equalAll slicedList True (Maybe.withDefault NoOne (List.Extra.getAt 0 slicedList)) then
+        Win
+
+    else if List.member PlayerX slicedList && List.member PlayerO slicedList then
+        UnwinableRow
+
+    else
+        PlayContinues
 
 
 checkWinandOutput : Model -> String
 checkWinandOutput model =
-    if checkWin model.board then
+    let
+        gameWinState =
+            checkWin model.board
+    in
+    if gameWinState == Win then
         case model.currentPlayer of
             PlayerX ->
                 "Player X won"
@@ -73,14 +84,14 @@ checkWinandOutput model =
             NoOne ->
                 ""
 
-    else if not (Bool.Extra.any (Array.Extra.mapToList (\player -> player == NoOne) model.board)) then
+    else if not (Bool.Extra.any (Array.Extra.mapToList (\player -> player == NoOne) model.board)) || gameWinState == Tie then
         "tie"
 
     else
         ""
 
 
-checkWin : Board -> Bool
+checkWin : Board -> WinReport
 checkWin board =
     {- let
          curriedwinCheckCols = winCheckCols (sqrt (Array.length model.board)) player
@@ -88,10 +99,17 @@ checkWin board =
     -}
     -- write a function to generate this array generally
     let
-        idx_array =
-            generateIdxArray board
+        winReportList =
+            Array.toList (Array.map (outerWinMap board) (generateIdxArray board))
     in
-    Bool.Extra.any (Array.toList (Array.map (outerWinMap board) idx_array))
+    if List.member Win winReportList then
+        Win
+
+    else if List.all ((==) UnwinableRow) winReportList then
+        Debug.log "tie" Tie
+
+    else
+        PlayContinues
 
 
 generateIdxArray : Board -> Array.Array (Array.Array Int)

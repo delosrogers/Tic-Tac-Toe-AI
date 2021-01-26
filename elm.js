@@ -5215,7 +5215,7 @@ var $author$project$Main$init = {
 		A2(
 			$elm$core$List$cons,
 			$author$project$Types$PlayerX,
-			A2($elm$core$List$repeat, 8, $author$project$Types$NoOne))),
+			A2($elm$core$List$repeat, 15, $author$project$Types$NoOne))),
 	currentPlayer: $author$project$Types$PlayerO,
 	message: '',
 	mousepos: _Utils_Tuple2(0, 0)
@@ -10648,6 +10648,8 @@ var $author$project$GameLogic$boardSet = F3(
 			return arr;
 		}
 	});
+var $author$project$Types$Tie = {$: 'Tie'};
+var $author$project$Types$Win = {$: 'Win'};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -10670,6 +10672,15 @@ var $elm$core$List$any = F2(
 		}
 	});
 var $Chadtech$elm_bool_extra$Bool$Extra$any = $elm$core$List$any($elm$core$Basics$identity);
+var $author$project$Types$PlayContinues = {$: 'PlayContinues'};
+var $author$project$Types$UnwinableRow = {$: 'UnwinableRow'};
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
 	function (func, _v0) {
@@ -10742,6 +10753,19 @@ var $author$project$GameLogic$generateIdxArray = function (board) {
 		A2($author$project$GameLogic$generateChildIdxArray, baseArray, numberofRows),
 		numberofArraysArray);
 };
+<<<<<<< HEAD
+=======
+var $elm$core$Debug$log = _Debug_log;
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+>>>>>>> master
 var $author$project$GameLogic$equalAll = F3(
 	function (list, lastBool, lastElement) {
 		equalAll:
@@ -10761,6 +10785,20 @@ var $author$project$GameLogic$equalAll = F3(
 			}
 		}
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm_community$list_extra$List$Extra$getAt = F2(
+	function (idx, xs) {
+		return (idx < 0) ? $elm$core$Maybe$Nothing : $elm$core$List$head(
+			A2($elm$core$List$drop, idx, xs));
+	});
 var $author$project$GameLogic$innerWinMap = F2(
 	function (gameArr, idx) {
 		return A2(
@@ -10770,20 +10808,22 @@ var $author$project$GameLogic$innerWinMap = F2(
 	});
 var $author$project$GameLogic$outerWinMap = F2(
 	function (gameArr, idxes) {
-		var slicedArr = A2(
-			$elm$core$Array$map,
-			$author$project$GameLogic$innerWinMap(gameArr),
-			idxes);
+		var slicedList = $elm$core$Array$toList(
+			A2(
+				$elm$core$Array$map,
+				$author$project$GameLogic$innerWinMap(gameArr),
+				idxes));
 		return A3(
 			$author$project$GameLogic$equalAll,
-			$elm$core$Array$toList(slicedArr),
+			slicedList,
 			true,
 			A2(
 				$elm$core$Maybe$withDefault,
 				$author$project$Types$NoOne,
-				A2($elm$core$Array$get, 0, slicedArr)));
+				A2($elm_community$list_extra$List$Extra$getAt, 0, slicedList))) ? $author$project$Types$Win : ((A2($elm$core$List$member, $author$project$Types$PlayerX, slicedList) && A2($elm$core$List$member, $author$project$Types$PlayerO, slicedList)) ? $author$project$Types$UnwinableRow : $author$project$Types$PlayContinues);
 	});
 var $author$project$GameLogic$checkWin = function (board) {
+<<<<<<< HEAD
 	var idx_array = $author$project$GameLogic$generateIdxArray(board);
 	return $Chadtech$elm_bool_extra$Bool$Extra$any(
 		$elm$core$Array$toList(
@@ -10791,6 +10831,17 @@ var $author$project$GameLogic$checkWin = function (board) {
 				$elm$core$Array$map,
 				$author$project$GameLogic$outerWinMap(board),
 				idx_array)));
+=======
+	var winReportList = $elm$core$Array$toList(
+		A2(
+			$elm$core$Array$map,
+			$author$project$GameLogic$outerWinMap(board),
+			$author$project$GameLogic$generateIdxArray(board)));
+	return A2($elm$core$List$member, $author$project$Types$Win, winReportList) ? $author$project$Types$Win : (A2(
+		$elm$core$List$all,
+		$elm$core$Basics$eq($author$project$Types$UnwinableRow),
+		winReportList) ? A2($elm$core$Debug$log, 'tie', $author$project$Types$Tie) : $author$project$Types$PlayContinues);
+>>>>>>> master
 };
 var $elm_community$array_extra$Array$Extra$mapToList = function (f) {
 	return A2(
@@ -10799,7 +10850,8 @@ var $elm_community$array_extra$Array$Extra$mapToList = function (f) {
 		_List_Nil);
 };
 var $author$project$GameLogic$checkWinandOutput = function (model) {
-	if ($author$project$GameLogic$checkWin(model.board)) {
+	var gameWinState = $author$project$GameLogic$checkWin(model.board);
+	if (_Utils_eq(gameWinState, $author$project$Types$Win)) {
 		var _v0 = model.currentPlayer;
 		switch (_v0.$) {
 			case 'PlayerX':
@@ -10810,13 +10862,13 @@ var $author$project$GameLogic$checkWinandOutput = function (model) {
 				return '';
 		}
 	} else {
-		if (!$Chadtech$elm_bool_extra$Bool$Extra$any(
+		if ((!$Chadtech$elm_bool_extra$Bool$Extra$any(
 			A2(
 				$elm_community$array_extra$Array$Extra$mapToList,
 				function (player) {
 					return _Utils_eq(player, $author$project$Types$NoOne);
 				},
-				model.board))) {
+				model.board))) || _Utils_eq(gameWinState, $author$project$Types$Tie)) {
 			return 'tie';
 		} else {
 			return '';
@@ -10834,6 +10886,7 @@ var $author$project$GameLogic$nextPlayer = function (player) {
 			return $author$project$Types$NoOne;
 	}
 };
+<<<<<<< HEAD
 var $author$project$AIPlayer$boardListToString = F2(
 	function (string, board) {
 		boardListToString:
@@ -10880,18 +10933,11 @@ var $elm_community$list_extra$List$Extra$getAt = F2(
 		return (idx < 0) ? $elm$core$Maybe$Nothing : $elm$core$List$head(
 			A2($elm$core$List$drop, idx, xs));
 	});
+=======
+>>>>>>> master
 var $author$project$AIPlayer$isMaximizingtoPlayer = function (isMaximizing) {
 	return isMaximizing ? $author$project$Types$PlayerX : $author$project$Types$PlayerO;
 };
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
@@ -11052,8 +11098,10 @@ var $elm_community$list_extra$List$Extra$setAt = F2(
 	});
 var $author$project$AIPlayer$miniMax = F3(
 	function (board, depth, isMaximizing) {
-		if ($author$project$GameLogic$checkWin(
-			$elm$core$Array$fromList(board))) {
+		if (_Utils_eq(
+			$author$project$GameLogic$checkWin(
+				$elm$core$Array$fromList(board)),
+			$author$project$Types$Win)) {
 			return (!A2($elm$core$List$member, $author$project$Types$NoOne, board)) ? 0 : (isMaximizing ? (-10) : 10);
 		} else {
 			if (isMaximizing) {
@@ -11178,7 +11226,7 @@ var $author$project$AIPlayer$bestMove = function (board) {
 var $author$project$Main$useAIPlayer = F3(
 	function (model, humanMove, aiPlay) {
 		return (model.ai && (_Utils_eq(model.currentPlayer, $author$project$Types$PlayerX) && aiPlay)) ? $elm$core$Maybe$Just(
-			$author$project$AIPlayer$bestMove(model.board)) : (_Utils_eq(model.currentPlayer, $author$project$Types$PlayerO) ? $elm$core$Maybe$Just(humanMove) : $elm$core$Maybe$Nothing);
+			$author$project$AIPlayer$bestMove(model.board)) : (_Utils_eq(model.currentPlayer, $author$project$Types$PlayerO) ? $elm$core$Maybe$Just(humanMove) : ((!model.ai) ? $elm$core$Maybe$Just(humanMove) : $elm$core$Maybe$Nothing));
 	});
 var $author$project$Main$updateBoard = F3(
 	function (cell, model, aiPlay) {
@@ -11200,7 +11248,7 @@ var $author$project$Main$updateBoard = F3(
 			{
 				currentPlayer: $author$project$GameLogic$nextPlayer(model.currentPlayer),
 				message: $author$project$GameLogic$checkWinandOutput(tmpModel)
-			}) : (((!aiPlay) && _Utils_eq(model.currentPlayer, $author$project$Types$PlayerO)) ? _Utils_update(
+			}) : ((!aiPlay) ? _Utils_update(
 			tmpModel,
 			{
 				currentPlayer: $author$project$GameLogic$nextPlayer(model.currentPlayer),
@@ -11225,8 +11273,12 @@ var $author$project$Main$update = F2(
 					false);
 			case 'AIPlay':
 				return A3($author$project$Main$updateBoard, 0, model, true);
-			default:
+			case 'Reset':
 				return $author$project$Main$init;
+			default:
+				return _Utils_update(
+					model,
+					{ai: !model.ai});
 		}
 	});
 var $author$project$Main$AIPlay = {$: 'AIPlay'};
@@ -11234,6 +11286,7 @@ var $author$project$Main$MouseClick = function (a) {
 	return {$: 'MouseClick', a: a};
 };
 var $author$project$Main$Reset = {$: 'Reset'};
+var $author$project$Main$TogleAI = {$: 'TogleAI'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableClear = F3(
 	function (a, b, c) {
 		return {$: 'DrawableClear', a: a, b: b, c: c};
@@ -12438,11 +12491,23 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text('let the AI player make a move')
-							]))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$TogleAI)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Togle AI player')
+							])),
+						$elm$html$Html$text(
+						model.ai ? 'the AI is playing' : 'the AI is not playing')
 					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
 	{init: $author$project$Main$init, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Html.Events.Extra.Mouse.Event":{"args":[],"type":"{ keys : Html.Events.Extra.Mouse.Keys, button : Html.Events.Extra.Mouse.Button, clientPos : ( Basics.Float, Basics.Float ), offsetPos : ( Basics.Float, Basics.Float ), pagePos : ( Basics.Float, Basics.Float ), screenPos : ( Basics.Float, Basics.Float ) }"},"Html.Events.Extra.Mouse.Keys":{"args":[],"type":"{ alt : Basics.Bool, ctrl : Basics.Bool, shift : Basics.Bool }"}},"unions":{"Main.Msg":{"args":[],"tags":{"Reset":[],"MouseClick":["Html.Events.Extra.Mouse.Event"],"AIPlay":[]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Html.Events.Extra.Mouse.Button":{"args":[],"tags":{"ErrorButton":[],"MainButton":[],"MiddleButton":[],"SecondButton":[],"BackButton":[],"ForwardButton":[]}},"Basics.Float":{"args":[],"tags":{"Float":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Html.Events.Extra.Mouse.Event":{"args":[],"type":"{ keys : Html.Events.Extra.Mouse.Keys, button : Html.Events.Extra.Mouse.Button, clientPos : ( Basics.Float, Basics.Float ), offsetPos : ( Basics.Float, Basics.Float ), pagePos : ( Basics.Float, Basics.Float ), screenPos : ( Basics.Float, Basics.Float ) }"},"Html.Events.Extra.Mouse.Keys":{"args":[],"type":"{ alt : Basics.Bool, ctrl : Basics.Bool, shift : Basics.Bool }"}},"unions":{"Main.Msg":{"args":[],"tags":{"Reset":[],"MouseClick":["Html.Events.Extra.Mouse.Event"],"AIPlay":[],"TogleAI":[]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Html.Events.Extra.Mouse.Button":{"args":[],"tags":{"ErrorButton":[],"MainButton":[],"MiddleButton":[],"SecondButton":[],"BackButton":[],"ForwardButton":[]}},"Basics.Float":{"args":[],"tags":{"Float":[]}}}}})}});}(this));
