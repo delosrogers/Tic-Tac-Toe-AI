@@ -93,7 +93,7 @@ bestMoveReduce board currentMove ( bestMoveInReduce, bestScore ) =
 
 miniMax : List Player -> Int -> Bool -> Int
 miniMax board depth isMaximizing =
-    if checkWin (Array.fromList board) then
+    if checkWin (Array.fromList board) == Win then
         if List.member NoOne board |> not then
             0
 

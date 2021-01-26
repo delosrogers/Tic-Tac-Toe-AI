@@ -2,6 +2,7 @@ module Types exposing (..)
 
 import Array
 import Tree
+import Array exposing (toIndexedList)
 
 
 type alias Model =
@@ -25,3 +26,10 @@ type alias Board =
 
 type alias GameTree =
     Tree.Tree ( Board, Int )
+
+
+type WinReport 
+    = Win
+    | UnwinableRow
+    | Tie
+    | PlayContinues
