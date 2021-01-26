@@ -1,9 +1,9 @@
 module GameLogic exposing (..)
 
-import List
 import Array
 import Array.Extra
 import Bool.Extra
+import List
 import Maybe
 import Types exposing (..)
 
@@ -38,9 +38,11 @@ boardSet idx value arr =
 equalAll : List Player -> Bool -> Player -> Bool
 equalAll list lastBool lastElement =
     case list of
-        [] -> lastBool
-        x::xs ->
-            equalAll xs ( lastBool && lastElement == x && x /= NoOne) x
+        [] ->
+            lastBool
+
+        x :: xs ->
+            equalAll xs (lastBool && lastElement == x && x /= NoOne) x
 
 
 innerWinMap : Array.Array Player -> Int -> Player
@@ -55,7 +57,7 @@ outerWinMap gameArr idxes =
             Array.map (innerWinMap gameArr) idxes
     in
     -- this is somewhere that will need to be adjusted for different sized boards, this should be general
-    equalAll (Array.toList slicedArr) True (Maybe.withDefault NoOne ( Array.get 0 slicedArr ))
+    equalAll (Array.toList slicedArr) True (Maybe.withDefault NoOne (Array.get 0 slicedArr))
 
 
 checkWinandOutput : Model -> String
@@ -89,7 +91,7 @@ checkWin board =
         idx_array =
             generateIdxArray board
     in
-    Bool.Extra.any (Array.toList (Array.map (outerWinMap (Debug.log "board in checkplayerwin" board)) (Debug.log "idx_array" idx_array)))
+    Bool.Extra.any (Array.toList (Array.map (outerWinMap board) idx_array))
 
 
 generateIdxArray : Board -> Array.Array (Array.Array Int)

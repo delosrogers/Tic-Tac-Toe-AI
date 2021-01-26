@@ -2,58 +2,31 @@ module AIPlayer exposing (bestMove)
 
 import Array
 import Basics exposing (..)
+import Dict
 import GameLogic exposing (..)
 import List
 import List.Extra
 import Maybe
+import Tree
 import Tuple
 import Types exposing (..)
+import Dict
 
 
+boardListToString : String -> List Player -> String
+boardListToString string board  =
+    case board of
+        [] ->
+            string
 
-{- bestMove : Model -> Int
-   bestMove model =
-       let
-           bestScore = -(1/0)
-       in
-       Array.indexedMap (\i state ->
-           max)
-
-   isMaximizingToPlayer Bool -> Player
-   isMaximizingToPlayer isMaximizing =
-       case isMaximizing of
-          True -> PlayerX
-          False -> PlayerO
-
-   nextBestScore : Board -> Int -> Bool -> ( Int, Int ) -> ( Int, Int )
-   nextBestScore board depth isMaximizing currentMoveAndScore =
-       let
-           ( currentMove, currentScore ) = currentMoveAndScore
-
-       in
-       if get (currentMove + 1) Board == NoOne then
-           let
-               nextScore = get ( (Tuple.first currentMoveAndScore) + 1) (Array.set (currentMove + 1) PlayerX Board) |> ( miniMax 0 False )
-           in
-           if isMaximizing then
-               if  nextScore > currentScore then
-                   ( currentMove + 1, nextScore)
-               else
-               currentMoveAndScore
-           else
-               if nextScore < currentScore then
-                   (currentMove + 1, nextScore)
-               else
-                   currentMoveAndScore
-       else
-           currentMoveAndScore
-
-
-   miniMax : Int -> Bool -> Board -> Int
-   miniMax depth isMaximizing board =
-       if Main.checkPlayerWin
-       Tuple.second (Iter.head(Iter.drop 8 (Iter.iter (nextBestScore Board (depth + 1) isMaximizing) (0,0))))
--}
+        x :: xs ->
+            case x of
+                PlayerX ->
+                    boardListToString (string ++ "x") xs
+                PlayerO ->
+                    boardListToString (string ++ "o") xs
+                NoOne ->
+                    boardListToString (string ++ "-") xs
 
 
 bestMove : Board -> Int
@@ -66,29 +39,51 @@ bestMove board =
             Array.toList board
     in
     --returns a tuple of bestmove and best score
-    List.foldl (bestMoveReduce boardList) ( 0, bestScore ) (List.range 0 (Array.length board - 1)) |> Tuple.first
+    (List.foldl (bestMoveReduce boardList) { bestMoveInReduce = 0, bestScore = bestScore, dict = Dict.empty } (List.range 0 (Array.length board - 1))).bestMoveInReduce
 
 
-bestMoveReduce : List Player -> Int -> ( Int, Int ) -> ( Int, Int )
-bestMoveReduce board currentMove ( bestMoveInReduce, bestScore ) =
-    if Maybe.withDefault NoOne (List.Extra.getAt currentMove board) == NoOne && bestScore <= 5 then
+transformBoard : List Player -> Maybe Int
+transformBoard board =
+     
+
+
+
+type alias BestMoveRecord =
+    { bestMoveInReduce : Int
+    , bestScore : Int
+    , dict : ScoreDict
+    }
+
+
+bestMoveReduce : List Player -> Int -> BestMoveRecord -> BestMoveRecord
+bestMoveReduce board currentMove bestMoveBests =
+    if Maybe.withDefault NoOne (List.Extra.getAt currentMove board) == NoOne && bestMoveBests.bestScore <= 5 then
         let
             score =
-                miniMax
-                    (List.Extra.setAt currentMove PlayerX board)
-                    0
-                    False
+                (\scoreDict modifiedBoard->
+                    let
+                        existingScore = Dict.get (modifiedBoard |> boardListToString "" ) scoreDict
+                    in
+                    case existingScore of
+                        Just aScore ->
+                            aScore
+                        Nothing ->
+                            miniMax modifiedBoard 0 False) bestMoveBests.dict (List.Extra.setAt currentMove PlayerX board)
         in
-        ( if score > bestScore then
-            currentMove
+        { bestMoveBests
+            | bestMoveInReduce =
+                if score > bestMoveBests.bestScore then
+                    currentMove
 
-          else
-            bestMoveInReduce
-        , max score bestScore
-        )
+                else
+                    bestMoveBests.bestMoveInReduce
+            , bestScore = max score bestMoveBests.bestScore
+            , dict = Debug.log "tree" (Dict.insert (( List.Extra.setAt currentMove PlayerX board ) |> boardListToString "") score bestMoveBests.dict)
+        }
 
     else
-        ( bestMoveInReduce, bestScore )
+        bestMoveBests
+
 
 
 miniMax : List Player -> Int -> Bool -> Int

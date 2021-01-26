@@ -2,6 +2,8 @@ module Types exposing (..)
 
 import Array
 import Tree
+import List
+import Dict
 
 
 type alias Model =
@@ -23,5 +25,5 @@ type alias Board =
     Array.Array Player
 
 
-type alias GameTree =
-    Tree.Tree ( Board, Int )
+type alias ScoreDict =
+    Dict.Dict String Int

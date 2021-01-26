@@ -10742,7 +10742,6 @@ var $author$project$GameLogic$generateIdxArray = function (board) {
 		A2($author$project$GameLogic$generateChildIdxArray, baseArray, numberofRows),
 		numberofArraysArray);
 };
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$GameLogic$equalAll = F3(
 	function (list, lastBool, lastElement) {
 		equalAll:
@@ -10790,9 +10789,8 @@ var $author$project$GameLogic$checkWin = function (board) {
 		$elm$core$Array$toList(
 			A2(
 				$elm$core$Array$map,
-				$author$project$GameLogic$outerWinMap(
-					A2($elm$core$Debug$log, 'board in checkplayerwin', board)),
-				A2($elm$core$Debug$log, 'idx_array', idx_array))));
+				$author$project$GameLogic$outerWinMap(board),
+				idx_array)));
 };
 var $elm_community$array_extra$Array$Extra$mapToList = function (f) {
 	return A2(
@@ -10825,6 +10823,7 @@ var $author$project$GameLogic$checkWinandOutput = function (model) {
 		}
 	}
 };
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$GameLogic$nextPlayer = function (player) {
 	switch (player.$) {
 		case 'PlayerO':
@@ -10835,6 +10834,38 @@ var $author$project$GameLogic$nextPlayer = function (player) {
 			return $author$project$Types$NoOne;
 	}
 };
+var $author$project$AIPlayer$boardListToString = F2(
+	function (string, board) {
+		boardListToString:
+		while (true) {
+			if (!board.b) {
+				return string;
+			} else {
+				var x = board.a;
+				var xs = board.b;
+				switch (x.$) {
+					case 'PlayerX':
+						var $temp$string = string + 'x',
+							$temp$board = xs;
+						string = $temp$string;
+						board = $temp$board;
+						continue boardListToString;
+					case 'PlayerO':
+						var $temp$string = string + 'o',
+							$temp$board = xs;
+						string = $temp$string;
+						board = $temp$board;
+						continue boardListToString;
+					default:
+						var $temp$string = string + '-',
+							$temp$board = xs;
+						string = $temp$string;
+						board = $temp$board;
+						continue boardListToString;
+				}
+			}
+		}
+	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -11088,25 +11119,48 @@ var $author$project$AIPlayer$miniMaxReduce = F5(
 		}
 	});
 var $author$project$AIPlayer$bestMoveReduce = F3(
-	function (board, currentMove, _v0) {
-		var bestMoveInReduce = _v0.a;
-		var bestScore = _v0.b;
+	function (board, currentMove, bestMoveBests) {
 		if (_Utils_eq(
 			A2(
 				$elm$core$Maybe$withDefault,
 				$author$project$Types$NoOne,
 				A2($elm_community$list_extra$List$Extra$getAt, currentMove, board)),
-			$author$project$Types$NoOne) && (bestScore <= 5)) {
-			var score = A3(
-				$author$project$AIPlayer$miniMax,
-				A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board),
-				0,
-				false);
-			return _Utils_Tuple2(
-				(_Utils_cmp(score, bestScore) > 0) ? currentMove : bestMoveInReduce,
-				A2($elm$core$Basics$max, score, bestScore));
+			$author$project$Types$NoOne) && (bestMoveBests.bestScore <= 5)) {
+			var score = A2(
+				F2(
+					function (scoreDict, modifiedBoard) {
+						var existingScore = A2(
+							$elm$core$Dict$get,
+							A2($author$project$AIPlayer$boardListToString, '', modifiedBoard),
+							scoreDict);
+						if (existingScore.$ === 'Just') {
+							var aScore = existingScore.a;
+							return aScore;
+						} else {
+							return A3($author$project$AIPlayer$miniMax, modifiedBoard, 0, false);
+						}
+					}),
+				bestMoveBests.dict,
+				A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board));
+			return _Utils_update(
+				bestMoveBests,
+				{
+					bestMoveInReduce: (_Utils_cmp(score, bestMoveBests.bestScore) > 0) ? currentMove : bestMoveBests.bestMoveInReduce,
+					bestScore: A2($elm$core$Basics$max, score, bestMoveBests.bestScore),
+					dict: A2(
+						$elm$core$Debug$log,
+						'tree',
+						A3(
+							$elm$core$Dict$insert,
+							A2(
+								$author$project$AIPlayer$boardListToString,
+								'',
+								A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board)),
+							score,
+							bestMoveBests.dict))
+				});
 		} else {
-			return _Utils_Tuple2(bestMoveInReduce, bestScore);
+			return bestMoveBests;
 		}
 	});
 var $author$project$AIPlayer$bestMove = function (board) {
@@ -11115,11 +11169,11 @@ var $author$project$AIPlayer$bestMove = function (board) {
 	return A3(
 		$elm$core$List$foldl,
 		$author$project$AIPlayer$bestMoveReduce(boardList),
-		_Utils_Tuple2(0, bestScore),
+		{bestMoveInReduce: 0, bestScore: bestScore, dict: $elm$core$Dict$empty},
 		A2(
 			$elm$core$List$range,
 			0,
-			$elm$core$Array$length(board) - 1)).a;
+			$elm$core$Array$length(board) - 1)).bestMoveInReduce;
 };
 var $author$project$Main$useAIPlayer = F3(
 	function (model, humanMove, aiPlay) {
