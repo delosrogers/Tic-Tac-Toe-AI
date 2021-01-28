@@ -108,7 +108,7 @@ bestMoveReduce : List Player -> Int -> BestMoveRecord -> BestMoveRecord
 bestMoveReduce board currentMove bestMoveBests =
     if Maybe.withDefault NoOne (List.Extra.getAt currentMove board) == NoOne && bestMoveBests.bestScore <= 5 then
         let
-            (newScoreDict, score) =
+            ( newScoreDict, score ) =
                 (\scoreDict modifiedBoard ->
                     let
                         existingScore =
@@ -116,7 +116,7 @@ bestMoveReduce board currentMove bestMoveBests =
                     in
                     case existingScore of
                         Just aScore ->
-                            (scoreDict, aScore)
+                            ( scoreDict, aScore )
 
                         Nothing ->
                             miniMax modifiedBoard 0 False scoreDict
@@ -124,16 +124,17 @@ bestMoveReduce board currentMove bestMoveBests =
                     bestMoveBests.dict
                     (List.Extra.setAt currentMove PlayerX board)
         in
-        { bestMoveBests
-            | bestMoveInReduce =
-                if score > bestMoveBests.bestScore then
-                    currentMove
+        Debug.log "bestMoveBests"
+            { bestMoveBests
+                | bestMoveInReduce =
+                    if Debug.log "moveScore" score > bestMoveBests.bestScore then
+                        currentMove
 
-                else
-                    bestMoveBests.bestMoveInReduce
-            , bestScore = max score bestMoveBests.bestScore
-            , dict = Debug.log "dict" (Dict.insert (List.Extra.setAt currentMove PlayerX board |> boardListToString "") score newScoreDict)
-        }
+                    else
+                        bestMoveBests.bestMoveInReduce
+                , bestScore = max score bestMoveBests.bestScore
+                , dict = Debug.log "dict" (Dict.insert (List.Extra.setAt currentMove PlayerX board |> boardListToString "") score newScoreDict)
+            }
 
     else
         bestMoveBests
@@ -179,7 +180,7 @@ miniMaxReduce depth board isMaximizing idx ( scoreDict, bestScore ) =
                         in
                         case existingScore of
                             Just aScore ->
-                                (  scoreDict, aScore )
+                                ( scoreDict, aScore )
 
                             Nothing ->
                                 miniMax modifiedBoard callDepth callIsMaximizing boardScoreDict
@@ -201,7 +202,7 @@ miniMaxReduce depth board isMaximizing idx ( scoreDict, bestScore ) =
                         in
                         case existingScore of
                             Just aScore ->
-                                (boardScoreDict, aScore)
+                                ( boardScoreDict, aScore )
 
                             Nothing ->
                                 miniMax modifiedBoard callDepth callIsMaximizing boardScoreDict
@@ -214,10 +215,10 @@ miniMaxReduce depth board isMaximizing idx ( scoreDict, bestScore ) =
             ( Dict.insert (List.Extra.setAt idx PlayerX board |> boardListToString "") score newScoreDict, min score bestScore )
 
         else
-            (scoreDict, bestScore)
+            ( scoreDict, bestScore )
 
     else
-        (scoreDict, bestScore)
+        ( scoreDict, bestScore )
 
 
 isMaximizingtoPlayer : Bool -> Player

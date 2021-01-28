@@ -11300,23 +11300,28 @@ var $author$project$AIPlayer$bestMoveReduce = F3(
 				A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board));
 			var newScoreDict = _v0.a;
 			var score = _v0.b;
-			return _Utils_update(
-				bestMoveBests,
-				{
-					bestMoveInReduce: (_Utils_cmp(score, bestMoveBests.bestScore) > 0) ? currentMove : bestMoveBests.bestMoveInReduce,
-					bestScore: A2($elm$core$Basics$max, score, bestMoveBests.bestScore),
-					dict: A2(
-						$elm$core$Debug$log,
-						'dict',
-						A3(
-							$elm$core$Dict$insert,
-							A2(
-								$author$project$AIPlayer$boardListToString,
-								'',
-								A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board)),
-							score,
-							newScoreDict))
-				});
+			return A2(
+				$elm$core$Debug$log,
+				'bestMoveBests',
+				_Utils_update(
+					bestMoveBests,
+					{
+						bestMoveInReduce: (_Utils_cmp(
+							A2($elm$core$Debug$log, 'moveScore', score),
+							bestMoveBests.bestScore) > 0) ? currentMove : bestMoveBests.bestMoveInReduce,
+						bestScore: A2($elm$core$Basics$max, score, bestMoveBests.bestScore),
+						dict: A2(
+							$elm$core$Debug$log,
+							'dict',
+							A3(
+								$elm$core$Dict$insert,
+								A2(
+									$author$project$AIPlayer$boardListToString,
+									'',
+									A3($elm_community$list_extra$List$Extra$setAt, currentMove, $author$project$Types$PlayerX, board)),
+								score,
+								newScoreDict))
+					}));
 		} else {
 			return bestMoveBests;
 		}
