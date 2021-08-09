@@ -12,21 +12,43 @@ import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
+import Http
+import Json.Decode exposing (Decoder, array, field, int, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Serialize as S
 import Types exposing (..)
 
 
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.sandbox
+        { init = init
+        , update = update
+        , view = view
+        }
 
 
 init : Model
 init =
-    { board = Array.fromList (PlayerX :: List.repeat 8 NoOne)
-    , currentPlayer = PlayerO
-    , message = ""
-    , mousepos = ( 0, 0 )
-    , ai = True
-    }
+    { board = Array.fromList (PlayerX :: List.repeat 15 NoOne)
+      , currentPlayer = PlayerO
+      , message = ""
+      , mousepos = ( 0, 0 )
+      , ai = True
+      , id_ = Maybe.Nothing
+      }
+
+
+
+-- getGameFromSave : String -> Cmd Msg
+-- getGameFromSave id =
+--     Http.get
+--     { url = "http://localhost:5000/api/saves/" ++ id
+--     , expect = Http.expectJson }
+-- modelDecoder : Decoder Model
+-- modelDecoder =
+--     Decode.succeed Model
+--     Json.map6
+--         (field)
 
 
 type Msg
@@ -167,17 +189,19 @@ drawGrid width height model =
         numRows =
             Array.length model.board |> toFloat |> Basics.sqrt |> round
     in
+    List.concat
+        [ List.map (\i -> Canvas.rect ( i * (width // numRows) |> toFloat, 0 ) 5 (toFloat height)) (List.range 1 numRows)
+        , List.map (\i -> Canvas.rect ( 0, i * (height // numRows) |> toFloat ) (toFloat width) 5) (List.range 1 numRows)
+        ]
 
-    List.concat [
-        List.map (\i -> Canvas.rect ( i * (width // numRows) |> toFloat, 0) 5 (toFloat height)) (List.range 1 numRows)
-        , List.map (\i -> Canvas.rect (0, i *(height//numRows) |> toFloat) (toFloat width) 5) (List.range 1 numRows)
-    ]
-    
-   {-  [ Canvas.rect ( width // numRows |> toFloat, 0 ) 5 (toFloat height)
-    , Canvas.rect ( 2 * (width // numRows) |> toFloat, 0 ) 5 (toFloat height)
-    , Canvas.rect ( 0, height // numRows |> toFloat ) (toFloat width) 5
-    , Canvas.rect ( 0, 2 * (height // numRows) |> toFloat ) (toFloat width) 5
-    ] -}
+
+
+{- [ Canvas.rect ( width // numRows |> toFloat, 0 ) 5 (toFloat height)
+   , Canvas.rect ( 2 * (width // numRows) |> toFloat, 0 ) 5 (toFloat height)
+   , Canvas.rect ( 0, height // numRows |> toFloat ) (toFloat width) 5
+   , Canvas.rect ( 0, 2 * (height // numRows) |> toFloat ) (toFloat width) 5
+   ]
+-}
 
 
 fillBoard : Int -> Int -> Model -> List Canvas.Renderable
